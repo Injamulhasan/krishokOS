@@ -214,86 +214,83 @@ export default function Hero() {
   </div>
 </section>
 
-      {/* ================= FEATURES ================= */}
+{/* ================= THREE SECTORS ================= */}
 
-      <section className="mx-auto max-w-7xl px-6 py-24">
-        <div className="mb-12">
-          <p className="mb-2 text-xs uppercase tracking-[4px] text-green-700">
-            মডিউল
-          </p>
+<section className="mx-auto max-w-[1280px] px-4 py-24 sm:px-6">
 
-          <h2 className="text-4xl font-medium">
-            তিনটি ধাপ, এক প্ল্যাটফর্ম
-          </h2>
-        </div>
+  {/* Header */}
+  <div className="mb-12">
+    <p className="mb-3 text-xs uppercase tracking-[4px] text-green-700">
+      মডিউল
+    </p>
 
-        <div className="grid gap-6 md:grid-cols-3">
-          {/* Card 1 */}
+    <h2 className="text-4xl font-black leading-tight text-[#1C2B1F] sm:text-5xl lg:text-6xl">
+      তিনটি খাত, এক প্ল্যাটফর্ম
+    </h2>
+  </div>
 
-          <div className="rounded-[24px] border border-[#e6dfd2] bg-white p-8 shadow-sm">
-            <div className="mb-4 text-4xl">
-              🌱
-            </div>
+  {/* Cards */}
+  <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
 
-            <h3 className="mb-2 text-xl font-bold">
-              ফসল ব্যবস্থাপনা
-            </h3>
+    {/* Card 1 — ফসল ব্যবস্থাপনা (Active) */}
+    <div className="rounded-[24px] border border-[#E8E2D8] bg-white p-8 shadow-sm">
+      <div className="mb-6 text-4xl">🌱</div>
 
-            <p className="mb-4 text-sm text-gray-600">
-              সম্পূর্ণ ফার্মিং গাইড ও পরিকল্পনা।
-            </p>
+      <h3 className="mb-2 text-2xl font-black text-[#1C2B1F]">
+        ফসল ব্যবস্থাপনা
+      </h3>
 
-            <span className="rounded-full bg-green-100 px-3 py-1 text-xs text-green-700">
-              কৃষক মডিউল
-            </span>
-          </div>
+      <p className="mb-8 leading-relaxed text-gray-500">
+        বপন থেকে রপ্তানি পর্যন্ত আর্টি পরিকল্পনা।
+      </p>
 
-          {/* Card 2 */}
+      <span className="inline-flex items-center gap-2 rounded-full bg-[#1C6B30] px-4 py-2 text-xs font-semibold text-white">
+        <span className="h-1.5 w-1.5 rounded-full bg-green-300" />
+        চালু আছে
+      </span>
+    </div>
 
-          <div className="rounded-[24px] border border-[#e6dfd2] bg-white p-8 shadow-sm">
-            <div className="mb-4 text-4xl">
-              🏭
-            </div>
+    {/* Card 2 — প্রাণিসম্পদ (Coming Soon) */}
+    <div className="rounded-[24px] border border-[#E8E2D8] bg-white p-8 shadow-sm">
+      <div className="mb-6 text-4xl">🐄</div>
 
-            <h3 className="mb-2 text-xl font-bold">
-              প্রসেসিং
-            </h3>
+      <h3 className="mb-2 text-2xl font-black text-[#1C2B1F]">
+        প্রাণিসম্পদ
+      </h3>
 
-            <p className="mb-4 text-sm text-gray-600">
-              মান নিয়ন্ত্রণ এবং উৎপাদন।
-            </p>
+      <p className="mb-8 leading-relaxed text-gray-500">
+        গবাদি পশুর স্বাস্থ্য, পুষ্টি ও উৎপাদন।
+      </p>
 
-            <span className="rounded-full bg-green-100 px-3 py-1 text-xs text-green-700">
-              প্রসেসিং
-            </span>
-          </div>
+      <span className="inline-flex items-center rounded-full border border-[#D5CCBF] px-4 py-2 text-xs font-medium text-gray-500">
+        শীঘ্রই আসছে
+      </span>
+    </div>
 
-          {/* Card 3 */}
+    {/* Card 3 — মৎস্য চাষ (Coming Soon) */}
+    <div className="rounded-[24px] border border-[#E8E2D8] bg-white p-8 shadow-sm">
+      <div className="mb-6 text-4xl">🐟</div>
 
-          <div className="rounded-[24px] border border-[#e6dfd2] bg-white p-8 shadow-sm">
-            <div className="mb-4 text-4xl">
-              🌍
-            </div>
+      <h3 className="mb-2 text-2xl font-black text-[#1C2B1F]">
+        মৎস্য চাষ
+      </h3>
 
-            <h3 className="mb-2 text-xl font-bold">
-              রপ্তানি চ্যান
-            </h3>
+      <p className="mb-8 leading-relaxed text-gray-500">
+        পুকুর, পানির গুণাগুণ ও মাছের বৃদ্ধি।
+      </p>
 
-            <p className="mb-4 text-sm text-gray-600">
-              বৈশ্বিক বাজারে কৃষি পণ্য।
-            </p>
+      <span className="inline-flex items-center rounded-full border border-[#D5CCBF] px-4 py-2 text-xs font-medium text-gray-500">
+        শীঘ্রই আসছে
+      </span>
+    </div>
 
-            <span className="rounded-full bg-green-100 px-3 py-1 text-xs text-green-700">
-              এক্সপোর্ট
-            </span>
-          </div>
-        </div>
-      </section>
+  </div>
+</section>
 
 
 {/* ================= CROPS SHOWCASE ================= */}
 
-<section className="mx-auto max-w-[1400px] px-4 py-20 sm:px-6">
+<section className="mx-auto max-w-[1280px] px-4 py-20 sm:px-6">
   <div className="mb-12 text-center">
     <p className="mb-3 text-xs uppercase tracking-[4px] text-green-700">
       জনপ্রিয় ফসল
@@ -395,7 +392,7 @@ export default function Hero() {
 
 {/* ================= GOALS SECTION / CULTIVATION METHODS  ================= */}
 
-<section className="mx-auto max-w-[1200px] px-4 py-24 sm:px-6">
+<section className="mx-auto max-w-[1280px] px-4 py-24 sm:px-6">
   <div className="mb-14 text-center">
     <p className="mb-3 text-xs uppercase tracking-[4px] text-green-700">
       চাষ পদ্ধতি
@@ -463,7 +460,7 @@ export default function Hero() {
 {/* ================= FARM PROFILE ================= */}
 
 <section className="bg-[#EFE6D8] py-24">
-  <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
+  <div className="mx-auto max-w-[1280px] px-4 sm:px-6">
     <div className="mb-16 text-center">
       <p className="mb-3 text-xs uppercase tracking-[4px] text-green-700">
         Farm Setup
@@ -545,7 +542,7 @@ export default function Hero() {
 
   <div className="absolute bottom-0 right-0 h-96 w-96 rounded-full bg-amber-100/40 blur-3xl" />
 
-  <div className="relative mx-auto max-w-[1200px] px-4 sm:px-6">
+  <div className="relative mx-auto max-w-[1280px] px-4 sm:px-6">
     
     {/* Header */}
 
@@ -716,7 +713,7 @@ export default function Hero() {
 
 {/* ================= PLATFORM / FULL LIFECYCLE ================= */}
 
-<section className="mx-auto max-w-[1200px] px-4 py-24 sm:px-6">
+<section className="mx-auto max-w-[1280px] px-4 py-24 sm:px-6">
 
   {/* Header */}
   <div className="mb-14">
@@ -793,7 +790,7 @@ export default function Hero() {
 
 {/* ================= AI ASSISTANT ================= */}
 
-<section className="mx-auto max-w-[1200px] px-4 py-10 sm:px-6">
+<section className="mx-auto max-w-[1280px] px-4 py-10 sm:px-6">
   <div className="overflow-hidden rounded-[36px] bg-gradient-to-r from-[#041B0B] to-[#0B3417] p-8 text-white shadow-2xl sm:p-14">
     <div className="grid items-center gap-10 lg:grid-cols-2">
       {/* LEFT */}
@@ -887,7 +884,7 @@ export default function Hero() {
 
 {/* ================= CTA SECTION ================= */}
 
-<section className="mx-auto max-w-[1200px] px-4 py-28 text-center">
+<section className="mx-auto max-w-[1280px] px-4 py-28 text-center">
   <div className="rounded-[40px] bg-[#EFE6D8] p-10 sm:p-16">
     <p className="mb-6 text-xs uppercase tracking-[4px] text-green-700">
       কৃষকOS
@@ -916,7 +913,7 @@ export default function Hero() {
 
 {/* ================= 70:30 FARM MODEL ================= */}
 
-<section className="mx-auto max-w-[1200px] px-4 py-10 sm:px-6">
+<section className="mx-auto max-w-[1280px] px-4 py-10 sm:px-6">
   <div className="overflow-hidden rounded-[36px] bg-gradient-to-br from-[#1C6B30] to-[#145222] p-10 text-white shadow-2xl sm:p-14">
     <div className="grid items-center gap-10 lg:grid-cols-2">
 
@@ -958,7 +955,7 @@ export default function Hero() {
 
 {/* ================= CTA SECTION ================= */}
 
-<section className="mx-auto max-w-[1200px] px-4 py-28 text-center">
+<section className="mx-auto max-w-[1280px] px-4 py-28 text-center">
   <div className="rounded-[40px] p-10 sm:p-16">
     <p className="mb-6 text-xs uppercase tracking-[4px] text-green-700">
 আমাদের স্বপ্ন
@@ -977,7 +974,7 @@ export default function Hero() {
 {/* ================= FOOTER ================= */}
 
 <footer className="border-t border-[#e4ddd0] bg-[#F7F4EE]">
-  <div className="mx-auto max-w-[1200px] px-4 py-12 sm:px-6">
+  <div className="mx-auto max-w-[1280px] px-4 py-12 sm:px-6">
     <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
       <div>
         <div className="flex items-center gap-3">
