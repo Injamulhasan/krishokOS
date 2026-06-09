@@ -9,52 +9,69 @@ export default function Hero() {
 
       
       {/* ================= HEADER ================= */}
-
+{/* ================= HEADER ================= */}
 <header className="sticky top-0 z-50 border-b border-[#dfe6dd] bg-[#F8F8F4]">
   <div className="mx-auto flex h-[68px] max-w-[1280px] items-center justify-between px-6">
-    
+
+    {/* LOGO */}
     <div className="flex items-center gap-3">
       <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#00A63E] text-white">
         কৃ
       </div>
-
       <div>
-        <h3 className="text-[18px] font-bold leading-none">
-         কৃষকOS
-        </h3>
-
-        <p className="mt-1 text-[10px] tracking-[2px] text-gray-500">
-          BANGLADESH
-        </p>
+        <h3 className="text-[18px] font-bold leading-none">কৃষকOS</h3>
+        <p className="mt-1 text-[10px] tracking-[2px] text-gray-500">BANGLADESH</p>
       </div>
     </div>
 
-    <nav className="hidden lg:flex items-center gap-12">
-      <a href="#">মডিউল</a>
-      <a href="#">ফসল</a>
-      <a href="#">পদ্ধতি</a>
-      <a href="#">ফার্ম সেটআপ</a>
-      <a href="#">ভিশন</a>
-      <a href="#">প্ল্যাটফর্ম</a>
-      <a href="#">৭০:৩০ মডেল</a>
-      <a href="#">স্বপ্ন</a>
+    {/* NAV — Desktop */}
+    <nav className="hidden xl:flex items-center gap-7 text-sm font-medium text-[#1C2B1F]">
+      <a href="#modules" className="transition hover:text-[#00963F]">মডিউল</a>
+      <a href="#crops" className="transition hover:text-[#00963F]">ফসল</a>
+      <a href="#methods" className="transition hover:text-[#00963F]">পদ্ধতি</a>
+      <a href="#farm-setup" className="transition hover:text-[#00963F]">ফার্ম সেটআপ</a>
+      <a href="#vision" className="transition hover:text-[#00963F]">ভিশন</a>
+      <a href="#platform" className="transition hover:text-[#00963F]">প্ল্যাটফর্ম</a>
+      <a href="#farm-model" className="transition hover:text-[#00963F]">৭০:৩০ মডেল</a>
+      <a href="#dream" className="transition hover:text-[#00963F]">স্বপ্ন</a>
     </nav>
 
+    {/* RIGHT ACTIONS */}
     <div className="flex items-center gap-4">
       <div className="hidden md:flex rounded-full border bg-white p-1">
-        <button className="rounded-full bg-[#00963F] px-4 py-1 text-xs text-white">
-          বাংলা
-        </button>
-
-        <button className="px-3 text-xs">
-          EN
-        </button>
+        <button className="rounded-full bg-[#00963F] px-4 py-1 text-xs text-white">বাংলা</button>
+        <button className="px-3 text-xs">EN</button>
       </div>
 
-      <Button className="rounded-full bg-[#00963F] px-6">
-        শুরু করুন
-      </Button>
+      <Button className="rounded-full bg-[#00963F] px-6">শুরু করুন</Button>
+
+      {/* Hamburger — mobile only */}
+      <button
+        className="flex xl:hidden flex-col gap-1.5 p-2"
+        onClick={() => {
+          const menu = document.getElementById("mobile-menu");
+          if (menu) menu.classList.toggle("hidden");
+        }}
+      >
+        <span className="h-0.5 w-5 bg-[#1C2B1F]" />
+        <span className="h-0.5 w-5 bg-[#1C2B1F]" />
+        <span className="h-0.5 w-5 bg-[#1C2B1F]" />
+      </button>
     </div>
+  </div>
+
+  {/* NAV — Mobile dropdown */}
+  <div id="mobile-menu" className="hidden xl:hidden border-t border-[#dfe6dd] bg-[#F8F8F4] px-6 py-4">
+    <nav className="flex flex-col gap-4 text-sm font-medium text-[#1C2B1F]">
+      <a href="#modules" className="transition hover:text-[#00963F]">মডিউল</a>
+      <a href="#crops" className="transition hover:text-[#00963F]">ফসল</a>
+      <a href="#methods" className="transition hover:text-[#00963F]">পদ্ধতি</a>
+      <a href="#farm-setup" className="transition hover:text-[#00963F]">ফার্ম সেটআপ</a>
+      <a href="#vision" className="transition hover:text-[#00963F]">ভিশন</a>
+      <a href="#platform" className="transition hover:text-[#00963F]">প্ল্যাটফর্ম</a>
+      <a href="#farm-model" className="transition hover:text-[#00963F]">৭০:৩০ মডেল</a>
+      <a href="#dream" className="transition hover:text-[#00963F]">স্বপ্ন</a>
+    </nav>
   </div>
 </header>
 
