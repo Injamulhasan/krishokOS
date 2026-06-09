@@ -714,6 +714,83 @@ export default function Hero() {
 </section>
 
 
+{/* ================= PLATFORM / FULL LIFECYCLE ================= */}
+
+<section className="mx-auto max-w-[1200px] px-4 py-24 sm:px-6">
+
+  {/* Header */}
+  <div className="mb-14">
+    <p className="mb-3 text-xs uppercase tracking-[4px] text-green-700">
+      প্ল্যাটফর্ম
+    </p>
+
+    <h2 className="text-4xl font-medium font-black leading-tight text-[#1C2B1F] sm:text-5xl lg:text-6xl">
+      একটি প্ল্যাটফর্ম, সম্পূর্ণ কৃষি জীবনচক্র
+    </h2>
+
+    <p className="mt-5 max-w-2xl text-base leading-relaxed text-gray-600">
+      প্ল্যান্টিক্স শুধু রোগ নির্ণয় করে। আরিওএস আপনাকে বলে আজ, এই
+      সপ্তাহে এবং সম্পূর্ণ মৌসুমে কী করতে হবে।
+    </p>
+  </div>
+
+  {/* 2×3 Feature Grid */}
+  <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+    {[
+      {
+        icon: "✦",
+        title: "বুদ্ধিদীপ্ত ফার্ম পরিকল্পনা",
+        description: "জাত নির্বাচন, সেচ, সার, খরচ ও মুনাফার পূর্ণ পরিকল্পনা।",
+      },
+      {
+        icon: "⟳",
+        title: "এআই রোগ শনাক্তকরণ",
+        description: "পাতা, ফল বা কাণ্ডের ছবি তুলুন — তাৎক্ষণিক চিকিৎসা পান।",
+      },
+      {
+        icon: "🗓",
+        title: "ফসল ক্যালেন্ডার ও পরামর্শ",
+        description: "প্রতি সপ্তাহে আবহাওয়া-সমন্বিত কাজের তালিকা।",
+      },
+      {
+        icon: "🛡",
+        title: "ট্রেসেবিলিটি ও রপ্তানি প্রস্তুতি",
+        description: "ক্ষেত থেকে ক্রেতা পর্যন্ত প্রতিটি ধাপের রেকর্ড।",
+      },
+      {
+        icon: "💳",
+        title: "আর্থিক ট্র্যাকিং",
+        description: "খরচ, আয়, লাভ-ক্ষতি ও একর প্রতি ROI।",
+      },
+      {
+        icon: "💬",
+        title: "এআই কৃষি বিশেষজ্ঞ",
+        description: "বাংলায় প্রশ্ন করুন, তথ্যভিত্তিক উত্তর পান।",
+      },
+    ].map((item) => (
+      <div
+        key={item.title}
+        className="group rounded-[24px] border border-[#E8E2D8] bg-white p-8 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+      >
+        {/* Icon bubble */}
+        <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-green-100 text-xl text-green-700">
+          {item.icon}
+        </div>
+
+        <h3 className="mb-3 text-xl font-bold text-[#1C2B1F]">
+          {item.title}
+        </h3>
+
+        <p className="leading-relaxed text-gray-500">
+          {item.description}
+        </p>
+      </div>
+    ))}
+  </div>
+</section>
+
+
+
 {/* ================= AI ASSISTANT ================= */}
 
 <section className="mx-auto max-w-[1200px] px-4 py-10 sm:px-6">
@@ -836,6 +913,47 @@ export default function Hero() {
   </div>
 </section>
 
+
+{/* ================= 70:30 FARM MODEL ================= */}
+
+<section className="mx-auto max-w-[1200px] px-4 py-10 sm:px-6">
+  <div className="overflow-hidden rounded-[36px] bg-gradient-to-br from-[#1C6B30] to-[#145222] p-10 text-white shadow-2xl sm:p-14">
+    <div className="grid items-center gap-10 lg:grid-cols-2">
+
+      {/* LEFT — Title & Description */}
+      <div>
+        <h2 className="text-5xl font-medium font-black leading-tight sm:text-6xl lg:text-6xl">
+          ৭০:৩০ ফার্ম মডেল
+        </h2>
+
+        <p className="mt-6 max-w-md text-base leading-relaxed text-white/75">
+          রুট জোন মালচিং, ভিত্রি খাদ ও VM স্প্রে সমন্বিত একটি বৈজ্ঞানিক
+          পদ্ধতি — অবশিষ্টাংশমুক্ত ও রপ্তানিযোগ্য ফলনের জন্য।
+        </p>
+      </div>
+
+      {/* RIGHT — Feature Buttons Grid */}
+      <div className="grid grid-cols-2 gap-3">
+        {[
+          "সার পরিকল্পনা",
+          "সেচ সময়সূচি",
+          "রোগ শনাক্তকরণ",
+          "ফলন পূর্বাভাস",
+          "খরচ-লাভ",
+          "Export Score",
+        ].map((label) => (
+          <button
+            key={label}
+            className="rounded-2xl border border-white/25 bg-white/10 px-5 py-4 text-left text-sm font-medium text-white backdrop-blur transition hover:bg-white/20"
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+    </div>
+  </div>
+</section>
 
 
 {/* ================= CTA SECTION ================= */}
