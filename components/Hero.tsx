@@ -6,6 +6,8 @@ import { ArrowRight } from "lucide-react";
 export default function Hero() {
   return (
     <div className="min-h-screen bg-[#F7F4EE] text-[#0f2416]">
+
+      
       {/* ================= HEADER ================= */}
 
 <header className="sticky top-0 z-50 border-b border-[#dfe6dd] bg-[#F8F8F4]">
@@ -28,9 +30,14 @@ export default function Hero() {
     </div>
 
     <nav className="hidden lg:flex items-center gap-12">
-      <a href="#">ফিচার</a>
+      <a href="#">মডিউল</a>
       <a href="#">ফসল</a>
-      <a href="#">ড্যাশবোর্ড</a>
+      <a href="#">পদ্ধতি</a>
+      <a href="#">ফার্ম সেটআপ</a>
+      <a href="#">ভিশন</a>
+      <a href="#">প্ল্যাটফর্ম</a>
+      <a href="#">৭০:৩০ মডেল</a>
+      <a href="#">স্বপ্ন</a>
     </nav>
 
     <div className="flex items-center gap-4">
