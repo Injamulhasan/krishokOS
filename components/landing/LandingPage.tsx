@@ -423,6 +423,70 @@ export default function LandingPage() {
         </div>
       </section>
 
+      <section
+        className="mx-auto max-w-[1280px] px-4 py-24 sm:px-6"
+        id="platform"
+      >
+        <div className="mb-14">
+          <p className="mb-3 text-xs uppercase tracking-[4px] text-green-700">
+            {locale.platform.label}
+          </p>
+          <h2 className="text-4xl font-medium font-black leading-tight text-[#1C2B1F] sm:text-5xl lg:text-6xl">
+            {locale.platform.title}
+          </h2>
+          <p className="mt-5 max-w-2xl text-base leading-relaxed text-gray-600">
+            {locale.platform.description}
+          </p>
+        </div>
+
+        <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+          {locale.platformFeatures.map((item) => (
+            <div
+              key={item.title}
+              className="group rounded-[24px] border border-[#E8E2D8] bg-white p-8 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+            >
+              <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-green-100 text-xl text-green-700">
+                {item.icon}
+              </div>
+              <h3 className="mb-3 text-xl font-bold text-[#1C2B1F]">
+                {item.title}
+              </h3>
+              <p className="leading-relaxed text-gray-500">
+                {item.description}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section
+        className="mx-auto max-w-[1280px] px-4 py-10 sm:px-6"
+        id="farm-model"
+      >
+        <div className="overflow-hidden rounded-[36px] bg-gradient-to-br from-[#1C6B30] to-[#145222] p-10 text-white shadow-2xl sm:p-14">
+          <div className="grid items-center gap-10 lg:grid-cols-2">
+            <div>
+              <h2 className="text-5xl font-medium font-black leading-tight sm:text-6xl lg:text-6xl">
+                {locale.farmModel.title}
+              </h2>
+              <p className="mt-6 max-w-md text-base leading-relaxed text-white/75">
+                {locale.farmModel.description}
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              {locale.modelButtons.map((label) => (
+                <button
+                  key={label}
+                  className="rounded-2xl border border-white/25 bg-white/10 px-5 py-4 text-left text-sm font-medium text-white backdrop-blur transition hover:bg-white/20"
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="bg-[#EFE6D8] py-24" id="farm-setup">
         <div className="mx-auto max-w-[1280px] px-4 sm:px-6">
           <div className="mb-16 text-center">
@@ -451,18 +515,6 @@ export default function LandingPage() {
                 </p>
               </div>
             ))}
-          </div>
-
-          <div className="mt-10 rounded-[28px] bg-green-700 p-8 text-white">
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-              <div>
-                <h3 className="text-2xl font-bold">{locale.platform.title}</h3>
-                <p className="mt-2 text-white/80">
-                  {locale.platform.description}
-                </p>
-              </div>
-              <div className="text-4xl font-black">১১ ধাপ</div>
-            </div>
           </div>
         </div>
       </section>
