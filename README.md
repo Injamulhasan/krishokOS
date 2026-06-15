@@ -2,7 +2,7 @@
 
 > Smart Agriculture Operating System for Bangladesh
 
-KrishokOS is a modern agricultural ERP and farm intelligence platform designed to help farmers, agribusinesses, and exporters manage the complete crop lifecycle—from planning and cultivation to harvest, traceability, and export readiness.
+KrishokOS is a modern agricultural ERP and farm intelligence platform designed to help farmers, agribusinesses, and exporters manage the complete crop lifecycle — from planning and cultivation to harvest, traceability, and export readiness. Built with a Bengali-first user experience, it supports language switching between Bengali and English throughout the entire platform.
 
 ---
 
@@ -14,57 +14,99 @@ Our mission is to create the digital infrastructure that enables farmers to impr
 
 ---
 
-## ✨ Features
+## ✨ Current Features
 
-### 🌾 Farm Lifecycle Management
+### 🌐 Bilingual Landing Page
 
-Manage the complete cultivation journey:
+A fully localized marketing landing page supporting Bengali ↔ English language switching:
 
-* Farm Setup
-* Crop Planning
-* Land Preparation
-* Planting
-* Irrigation Scheduling
-* Disease Monitoring
-* Harvest Planning
-* Market & Export Preparation
+- Sticky navigation header with mobile menu
+- Hero section with CTA buttons, platform stats, and crop showcase
+- Module cards, cultivation methods, farm setup grid
+- Journey timeline and platform feature overview
+- AI assistant panel and footer
+- All content driven from a translations object — no DOM toggling
 
----
+### 🔐 Authentication System
 
-### 📊 Agricultural ERP
+Complete account management with session persistence:
 
-Streamline farm operations through:
+- **Signup** — name, email, phone, and password registration
+- **Email Verification** — token-based email confirmation flow
+- **Sign In** — email or phone + password login
+- **Forgot Password / Reset Password** — secure token-based password recovery
+- **Session Persistence** — HTTP-only cookie with JWT-style session token
+- **Protected Routes** — unauthenticated users redirected to sign-in
 
-* Production Record Management
-* Input & Inventory Tracking
-* Expense Monitoring
-* Task Scheduling
-* Yield Tracking
-* Multi-Farm Support
+User data is stored in `data/users.json` with PBKDF2 password hashing. Verification and reset tokens are cleared after use.
 
----
+Auth pages live at `/auth/signup`, `/auth/signin`, `/auth/verify-email`, `/auth/forgot-password`, `/auth/resetpassword`.
 
-### 🤖 AI-Powered Agriculture *(Planned)*
+Auth API endpoints:
 
-Future capabilities include:
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/auth/signup` | Create new account |
+| POST | `/api/auth/signin` | Sign in with credentials |
+| POST | `/api/auth/verify-email` | Verify email with token |
+| POST | `/api/auth/forgot-password` | Request password reset |
+| POST | `/api/auth/resetpassword` | Set new password |
+| GET | `/api/auth/me` | Get current session user |
+| GET | `/api/dashboard` | Protected dashboard route |
 
-* Disease Detection from Images
-* Smart Irrigation Recommendations
-* Fertilizer Optimization
-* Weather-Based Advisory
-* Predictive Yield Analytics
+### 🌿 Plant Management & Crop/Method Selection
 
----
+A pre-wizard selection screen at `/plant-management` where authenticated users choose:
 
-### 🌍 Export Readiness *(Planned)*
+- **Crop** — Banana Farming or Papaya Farming (selection cards with hover animations and green glow borders)
+- **Farming Method** — Residue-Free, Organic, or Chemical (with badges and check indicators)
 
-Designed for residue-free and export-oriented farming:
+Selections are posted to the backend and pre-populate the farm setup wizard before it opens.
 
-* GAP Compliance Tracking
-* Traceability Records
-* Residue-Free Production Workflows
-* Harvest Documentation
-* Export Readiness Scoring
+### 🧙 11-Step Farm Setup Wizard
+
+A guided onboarding wizard at `/wizard` for authenticated users to create their first farm profile. Features save/resume, cascading location dropdowns, unit conversion, step validation, and redirect to dashboard on completion.
+
+| Step | Content |
+|------|---------|
+| 1 | Farmer Identity (name, phone, email, national ID) |
+| 2 | Farm Name & Type (pre-populated from plant-management) |
+| 3 | Soil & Water (soil type, water source) |
+| 4–6 | Location cascade (District → Upazila → Union) |
+| 7 | Land Size with unit converter (decimal ↔ bigha ↔ katha) |
+| 8 | Primary Crop (pre-populated from plant-management) |
+| 9 | Secondary Crops (multi-select) |
+| 10 | Annual Budget |
+| 11 | Review & Confirm (read-only summary before submission) |
+
+Wizard state is tracked in `data/wizardprogress.json`. On completion, FARMER and FARM records are created in `data/farmers.json` and `data/farms.json`.
+
+Wizard API endpoints:
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/wizard/start` | Initialize or reset wizard with crop/method |
+| PUT | `/api/wizard/step/[stepNumber]` | Save individual step data |
+| GET | `/api/wizard/progress` | Fetch current wizard state |
+| GET | `/api/wizard/locations` | Cascading district → upazila → union data |
+| POST | `/api/wizard/complete` | Finalize wizard and create farm records |
+
+### 📊 Personalized Dashboard
+
+The dashboard at `/dashboard` adapts based on whether the user has completed farm setup:
+
+**Before setup:** Renders original mock statistics (Farms: 2, Crops: 2, Alerts: 3) and a default advisory calendar.
+
+**After setup:** Dynamically renders personalized analytics based on actual farm data:
+
+- **Quick Stats** — actual active farm count, exact land area with units, crop list, alerts
+- **Personalized Farm Insights & Analytics Panel:**
+  - Farm Profile Overview (crop, location, farming method)
+  - Soil & Irrigation Diagnostics (custom guidance based on soil type and water source)
+  - Farming Method Compliance & Strategy (target market, GAP protocols, NPK guidelines)
+  - Financial Forecast & ROI (projected yield, 75/25 input cost model, revenue estimates)
+  - Custom Daily Advisory Calendar (crop and method-specific schedules)
+- Full ERP module grid (Production, Inventory, Scheduling, etc.) always visible below
 
 ---
 
@@ -72,51 +114,110 @@ Designed for residue-free and export-oriented farming:
 
 ### Frontend
 
-* Next.js 15
-* React 19
-* TypeScript
-* Tailwind CSS
-* ShadCN UI
-* Lucide React
+- Next.js 16 (App Router)
+- React 19
+- TypeScript
+- Tailwind CSS
+- ShadCN UI
+- Lucide React
+- `next/image` for optimized image rendering
+
+### Backend
+
+- Next.js API Routes (App Router)
+- JSON file-based data storage (`data/*.json`)
+- PBKDF2 password hashing
+- HTTP-only cookie sessions
 
 ### Development Tools
 
-* Git
-* GitHub
-* Vercel
+- Git / GitHub
+- Vercel (deployment)
 
 ---
 
 ## 📂 Project Structure
 
-```text
+```
 krishokOS/
 │
-├── app/                  # Next.js App Router pages
-├── components/           # Reusable UI components
-├── lib/                  # Utility functions
-├── public/               # Static assets and images
+├── app/
+│   ├── api/
+│   │   ├── auth/               # Auth API endpoints
+│   │   │   ├── signup/
+│   │   │   ├── signin/
+│   │   │   ├── verify-email/
+│   │   │   ├── forgot-password/
+│   │   │   ├── resetpassword/
+│   │   │   ├── me/
+│   │   │   └── dashboard/
+│   │   └── wizard/             # Wizard API endpoints
+│   │       ├── start/
+│   │       ├── step/[stepNumber]/
+│   │       ├── progress/
+│   │       ├── locations/
+│   │       └── complete/
+│   ├── auth/                   # Auth UI pages
+│   │   ├── signup/
+│   │   ├── signin/
+│   │   ├── verify-email/
+│   │   ├── forgot-password/
+│   │   └── resetpassword/
+│   ├── dashboard/              # Protected dashboard page
+│   ├── plant-management/       # Crop & method selector
+│   ├── wizard/                 # 11-step farm setup wizard
+│   ├── layout.tsx              # Bengali/Latin fonts, metadata
+│   ├── page.tsx                # Entry point → LandingPage
+│   └── globals.css
 │
-├── .gitignore
+├── components/
+│   ├── wizard/
+│   │   ├── WizardLayout.tsx
+│   │   ├── ProgressTracker.tsx
+│   │   ├── SuccessModal.tsx
+│   │   ├── useWizardProgress.ts
+│   │   └── steps/              # Step1.tsx through Step11.tsx
+│   ├── LandingPage.tsx         # Language state owner; composes all sections
+│   ├── Header.tsx              # Nav with language toggle and mobile menu
+│   ├── HeroSection.tsx
+│   ├── ModuleCards.tsx
+│   ├── CropsShowcase.tsx
+│   ├── Hero.tsx                # Thin wrapper → LandingPage
+│   ├── button.tsx
+│   └── PlantManagementClient.tsx
+│
+├── lib/
+│   ├── auth.ts                 # Password hash, JWT tokens, session cookies
+│   ├── wizardDb.ts             # Wizard, farmer, and farm data helpers
+│   ├── validation.ts           # Step validators (all 11 steps)
+│   ├── unitConverter.ts        # Bigha ↔ decimal ↔ katha conversions
+│   └── utils.ts                # cn() Tailwind class helper
+│
+├── data/
+│   ├── users.json              # User accounts (hashed passwords)
+│   ├── farmers.json            # Farmer profiles
+│   ├── farms.json              # Farm records (incl. farmingMethod)
+│   ├── wizardprogress.json     # Wizard state per user
+│   ├── locations.json          # Bangladesh districts → upazilas → unions
+│   └── crops.json              # Static crop list
+│
+├── public/                     # Static assets
+├── next.config.mjs             # Unsplash remote image pattern, allowedDevOrigins
 ├── components.json
-├── next.config.mjs
-├── package.json
-├── package-lock.json
 ├── tsconfig.json
-└── README.md
+├── eslint.config.mjs
+└── package.json
 ```
 
 ---
 
 ## 🎨 Design Principles
 
-KrishokOS follows a design system focused on:
-
-* Bengali-first user experience
-* Clean and modern interfaces
-* Accessibility and responsiveness
-* Agriculture-inspired visual language
-* Enterprise-grade usability
+- **Bengali-first** — default language is Bengali; all UI copy is fully translated
+- **Clean and modern** — agriculture-inspired visual language with green tones
+- **Accessible and responsive** — mobile menu, fluid layouts, readable typography
+- **Component-driven** — each page section is an isolated, reusable component
+- **Data-driven text** — navigation links, stats, cards, and steps all render from structured arrays
 
 ---
 
@@ -124,59 +225,31 @@ KrishokOS follows a design system focused on:
 
 ### Prerequisites
 
-Make sure you have installed:
-
-* Node.js (v20 or later recommended)
-* Git
-* npm
-
----
+- Node.js v20 or later
+- Git
+- npm
 
 ### Installation
 
-Clone the repository:
-
 ```bash
 git clone https://github.com/Injamulhasan/krishokOS.git
-```
-
-Navigate to the project directory:
-
-```bash
 cd krishokOS
-```
-
-Install dependencies:
-
-```bash
 npm install
-```
-
-Start the development server:
-
-```bash
 npm run dev
 ```
 
-Open your browser and visit:
+Open your browser at:
 
-```text
+```
 http://localhost:3000
 ```
 
----
+For network access (e.g. from another device on your LAN), the dev server is configured with `allowedDevOrigins` so HMR works at your local network address as well.
 
-## 📦 Build for Production
-
-Generate a production build:
+### Build for Production
 
 ```bash
 npm run build
-```
-
-Run the production server locally:
-
-```bash
 npm start
 ```
 
@@ -184,70 +257,76 @@ npm start
 
 ## ☁️ Deployment
 
-KrishokOS is deployed using **Vercel**.
+KrishokOS is deployed on **Vercel**.
 
-Every push to the `main` branch automatically triggers a new production deployment.
+Live URL: [krishok-os.vercel.app](https://krishok-os.vercel.app)
 
-Preview deployments are generated for feature branches and pull requests.
+Every push to `main` triggers a new production deployment. Feature branches generate preview deployments automatically.
 
 ---
 
 ## 🌿 Git Workflow
 
-The project follows a feature-branch workflow.
-
-### Create a new feature branch
-
 ```bash
+# Create a feature branch
 git checkout -b feature/feature-name
-```
 
-### Commit changes
-
-```bash
+# Commit and push
 git add .
-
 git commit -m "Describe your changes"
-```
-
-### Push branch
-
-```bash
 git push origin feature/feature-name
+
+# Open a Pull Request on GitHub and merge after review
 ```
-
-### Open a Pull Request
-
-Submit a Pull Request on GitHub and merge after review.
 
 ---
 
 ## 🛣 Roadmap
 
-### Phase 1 — Marketing Website
+### Phase 1 — Marketing Website ✅
 
-* [x] Landing Page
-* [x] Responsive Design
-* [x] Vercel Deployment
+- [x] Bilingual landing page (Bengali / English)
+- [x] Responsive header, hero, modules, crops showcase
+- [x] Vercel deployment
 
-### Phase 2 — Farm ERP
+### Phase 2 — Authentication ✅
 
-* [ ] Farmer Profiles
-* [ ] Farm Registration
-* [ ] Crop Planning
-* [ ] Expense Tracking
+- [x] Signup, sign-in, email verification
+- [x] Password reset flow
+- [x] Session persistence (HTTP-only cookie)
+- [x] Protected dashboard route
 
-### Phase 3 — AI Assistant
+### Phase 3 — Farm Setup ✅
 
-* [ ] Disease Detection
-* [ ] Smart Recommendations
-* [ ] Advisory System
+- [x] Plant management & crop/method selection screen
+- [x] 11-step onboarding wizard with save/resume
+- [x] Cascading location dropdowns (District → Upazila → Union)
+- [x] Land unit converter (bigha ↔ decimal ↔ katha)
+- [x] FARMER and FARM record creation on wizard completion
 
-### Phase 4 — Export Platform
+### Phase 4 — Personalized Dashboard ✅
 
-* [ ] GAP Compliance
-* [ ] Traceability
-* [ ] Export Documentation
+- [x] Dynamic stats based on actual farm data
+- [x] Soil & irrigation advisory panel
+- [x] Farming method compliance & strategy guidance
+- [x] Financial forecast & ROI estimations (75/25 model)
+- [x] Custom daily advisory calendar
+
+### Phase 5 — AI Assistant *(Planned)*
+
+- [ ] Disease detection from images
+- [ ] Smart irrigation recommendations
+- [ ] Fertilizer optimization
+- [ ] Weather-based advisory
+- [ ] Predictive yield analytics
+
+### Phase 6 — Export Platform *(Planned)*
+
+- [ ] GAP compliance tracking
+- [ ] Traceability records
+- [ ] Residue-free production workflows
+- [ ] Harvest documentation
+- [ ] Export readiness scoring
 
 ---
 
@@ -255,21 +334,17 @@ Submit a Pull Request on GitHub and merge after review.
 
 Contributions, ideas, and feedback are welcome.
 
-If you would like to contribute:
-
-1. Fork the repository.
-2. Create a feature branch.
-3. Commit your changes.
-4. Push the branch.
-5. Open a Pull Request.
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push the branch
+5. Open a Pull Request
 
 ---
 
 ## 📄 License
 
-This project is currently under active development.
-
-A formal open-source license will be added in future releases.
+This project is currently under active development. A formal open-source license will be added in a future release.
 
 ---
 
@@ -281,4 +356,4 @@ Building digital solutions for the future of agriculture in Bangladesh.
 
 ---
 
-### 🌱 Building the future of Bangladeshi agriculture through technology.
+> 🌱 Building the future of Bangladeshi agriculture through technology.
