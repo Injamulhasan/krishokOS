@@ -1,0 +1,48 @@
+[
+  {
+    "id": "225791014fab82f0391d01b2c7117c46",
+    "farmerId": "bdf8c2c303ddd65c40aad34f183b040a",
+    "farmName": "akash",
+    "farmType": "fruit",
+    "soilType": "clay",
+    "waterSource": "mixed",
+    "district": "barisal",
+    "upazila": "barisal_city",
+    "union": "Bakerganj",
+    "areaSize": 20,
+    "areaUnit": "bigha",
+    "primaryCrop": "banana",
+    "farmingMethod": "residue_free",
+    "secondaryCrops": [
+      "rice",
+      "wheat",
+      "maize"
+    ],
+    "annualBudget": 150000,
+    "budgetCurrency": "BDT",
+    "createdAt": 1781533939400,
+    "updatedAt": 1781533939400
+  },
+  {
+    "id": "c08d13a3ff2cdb836365d749f17d3f6d",
+    "farmerId": "63d1c53806d7262c4a3e1c5d60f6eae2",
+    "farmName": "test2",
+    "farmType": "fruit",
+    "soilType": "sandy",
+    "waterSource": "tube-well",
+    "district": "dhaka",
+    "upazila": "gazipur",
+    "union": "Kaliganj",
+    "areaSize": 100,
+    "areaUnit": "bigha",
+    "primaryCrop": "banana",
+    "farmingMethod": "organic",
+    "secondaryCrops": [
+      "cabbage"
+    ],
+    "annualBudget": 50000,
+    "budgetCurrency": "BDT",
+    "createdAt": 1781548966704,
+    "updatedAt": 1781548966704
+  }
+]
