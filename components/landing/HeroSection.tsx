@@ -30,7 +30,15 @@ const heroKpis: Record<Language, { value: string; label: string }[]> = {
   ],
 };
 
-export default function HeroSection({ language }: { language: Language }) {
+export default function HeroSection({
+  language,
+  onPrimaryClick,
+  onSecondaryClick,
+}: {
+  language: Language;
+  onPrimaryClick: () => void;
+  onSecondaryClick: () => void;
+}) {
   const isEnglish = language === "en";
 
   return (
@@ -75,10 +83,16 @@ export default function HeroSection({ language }: { language: Language }) {
             </p>
 
             <div className="mt-10 flex flex-wrap gap-4">
-              <Button className="flex h-[56px] items-center rounded-full bg-[#00A63E] px-8 font-semibold text-white transition hover:bg-[#008737]">
+              <Button
+                className="flex h-[56px] items-center rounded-full bg-[#00A63E] px-8 font-semibold text-white transition hover:bg-[#008737]"
+                onClick={onPrimaryClick}
+              >
                 {isEnglish ? "Start Farm Setup →" : "ফার্ম সেটআপ শুরু করুন →"}
               </Button>
-              <Button className="flex h-[56px] items-center rounded-full border border-[#D7D7D7] bg-white px-8 font-semibold text-[#08210F] transition hover:bg-gray-50">
+              <Button
+                className="flex h-[56px] items-center rounded-full border border-[#D7D7D7] bg-white px-8 font-semibold text-[#08210F] transition hover:bg-gray-50"
+                onClick={onSecondaryClick}
+              >
                 {isEnglish ? "View Dashboard" : "ড্যাশবোর্ড দেখুন"}
               </Button>
             </div>

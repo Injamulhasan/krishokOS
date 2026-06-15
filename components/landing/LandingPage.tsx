@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import CropsShowcase from "./CropsShowcase";
 import Header, { type Language } from "./Header";
@@ -373,16 +374,29 @@ const translations: Record<
 
 export default function LandingPage() {
   const [language, setLanguage] = useState<Language>("bn");
+  const router = useRouter();
   const locale = translations[language];
 
   useEffect(() => {
     document.documentElement.lang = language;
   }, [language]);
 
+  const handleStartClick = () => {
+    router.push("/auth/signin");
+  };
+
   return (
     <div className="min-h-screen bg-[#F7F4EE] text-[#0f2416]">
-      <Header language={language} onLanguageChange={setLanguage} />
-      <HeroSection language={language} />
+      <Header
+        language={language}
+        onLanguageChange={setLanguage}
+        onStartClick={handleStartClick}
+      />
+      <HeroSection
+        language={language}
+        onPrimaryClick={handleStartClick}
+        onSecondaryClick={handleStartClick}
+      />
       <ModuleCards language={language} />
       <CropsShowcase language={language} />
 

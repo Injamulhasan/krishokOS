@@ -1,0 +1,59 @@
+{
+  "FARMER": {
+    "description": "Farmer profile information",
+    "fields": {
+      "id": "UUID - unique farmer identifier",
+      "userId": "string - reference to authenticated user in users.json",
+      "fullName": "string - farmer's full name",
+      "phone": "string - farmer's phone number (11 digits, starts with 01)",
+      "email": "string - farmer's email address",
+      "nationalId": "string - farmer's national ID (13 digits for NID, or passport)",
+      "createdAt": "number - timestamp of creation",
+      "updatedAt": "number - timestamp of last update"
+    }
+  },
+  "FARM": {
+    "description": "Farm information created through wizard",
+    "fields": {
+      "id": "UUID - unique farm identifier",
+      "farmerId": "UUID - reference to FARMER.id",
+      "farmName": "string - name of the farm",
+      "farmType": "string - type: 'vegetable' | 'rice' | 'fruit' | 'mixed' | 'aquaculture' | 'dairy' | 'poultry'",
+      "soilType": "string - 'clay' | 'sandy' | 'loam' | 'silt' | 'peat' | 'mixed'",
+      "waterSource": "string - 'tube-well' | 'surface-water' | 'rainwater' | 'canal' | 'pond' | 'river' | 'mixed'",
+      "district": "string - Bangladesh district name",
+      "upazila": "string - Upazila (sub-district) name",
+      "union": "string - Union (smallest administrative unit) name",
+      "areaSize": "number - land area size (in decimal)",
+      "areaUnit": "string - unit: 'decimal' | 'bigha' | 'katha'",
+      "primaryCrop": "string - primary crop (from crops.json)",
+      "secondaryCrops": "array<string> - secondary crops (optional)",
+      "annualBudget": "number - annual farm budget",
+      "budgetCurrency": "string - currency: 'BDT' | 'USD'",
+      "createdAt": "number - timestamp of farm creation",
+      "updatedAt": "number - timestamp of last update"
+    }
+  },
+  "WIZARDPROGRESS": {
+    "description": "Tracks wizard completion state for resume functionality",
+    "fields": {
+      "id": "UUID - unique wizard session identifier",
+      "farmerId": "UUID - reference to FARMER.id (or temp ID if farmer not created yet)",
+      "currentStep": "number - current step (1-11)",
+      "completedSteps": "array<number> - list of completed step numbers",
+      "stepData": "object - { 1: {...}, 2: {...}, ... } - saved form data per step",
+      "resumeToken": "string - unique token for session resumption (optional, for security)",
+      "lastSavedAt": "number - timestamp of last save",
+      "completedAt": "number - timestamp when wizard completed (null if not complete)",
+      "expiresAt": "number - timestamp when wizard session expires (24 hours)"
+    }
+  },
+  "notes": {
+    "storage": "All tables stored in separate JSON files under data/ directory",
+    "files": {
+      "data/farmers.json": "Array of FARMER objects",
+      "data/farms.json": "Array of FARM objects",
+      "data/wizard-progress.json": "Array of WIZARDPROGRESS objects"
+    }
+  }
+}

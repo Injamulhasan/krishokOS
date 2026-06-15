@@ -1,0 +1,171 @@
+{
+  "crops": [
+    {
+      "value": "rice",
+      "label": "Rice",
+      "labelbn": "ধান",
+      "season": ["monsoon", "winter"],
+      "category": "cereal"
+    },
+    {
+      "value": "wheat",
+      "label": "Wheat",
+      "labelbn": "গম",
+      "season": ["winter"],
+      "category": "cereal"
+    },
+    {
+      "value": "maize",
+      "label": "Maize",
+      "labelbn": "ভুট্টা",
+      "season": ["summer", "monsoon"],
+      "category": "cereal"
+    },
+    {
+      "value": "potato",
+      "label": "Potato",
+      "labelbn": "আলু",
+      "season": ["winter"],
+      "category": "vegetable"
+    },
+    {
+      "value": "onion",
+      "label": "Onion",
+      "labelbn": "পিঁয়াজ",
+      "season": ["winter"],
+      "category": "vegetable"
+    },
+    {
+      "value": "garlic",
+      "label": "Garlic",
+      "labelbn": "রসুন",
+      "season": ["winter"],
+      "category": "vegetable"
+    },
+    {
+      "value": "tomato",
+      "label": "Tomato",
+      "labelbn": "টমেটো",
+      "season": ["winter", "summer"],
+      "category": "vegetable"
+    },
+    {
+      "value": "eggplant",
+      "label": "Eggplant",
+      "labelbn": "বেগুন",
+      "season": ["summer", "monsoon"],
+      "category": "vegetable"
+    },
+    {
+      "value": "cucumber",
+      "label": "Cucumber",
+      "labelbn": "শসা",
+      "season": ["summer", "monsoon"],
+      "category": "vegetable"
+    },
+    {
+      "value": "spinach",
+      "label": "Spinach",
+      "labelbn": "পালং শাক",
+      "season": ["winter"],
+      "category": "vegetable"
+    },
+    {
+      "value": "cabbage",
+      "label": "Cabbage",
+      "labelbn": "বাঁধাকপি",
+      "season": ["winter"],
+      "category": "vegetable"
+    },
+    {
+      "value": "carrot",
+      "label": "Carrot",
+      "labelbn": "গাজর",
+      "season": ["winter"],
+      "category": "vegetable"
+    },
+    {
+      "value": "radish",
+      "label": "Radish",
+      "labelbn": "মুলা",
+      "season": ["winter"],
+      "category": "vegetable"
+    },
+    {
+      "value": "mango",
+      "label": "Mango",
+      "labelbn": "আম",
+      "season": ["summer"],
+      "category": "fruit"
+    },
+    {
+      "value": "banana",
+      "label": "Banana",
+      "labelbn": "কলা",
+      "season": ["year-round"],
+      "category": "fruit"
+    },
+    {
+      "value": "papaya",
+      "label": "Papaya",
+      "labelbn": "পেঁপে",
+      "season": ["year-round"],
+      "category": "fruit"
+    },
+    {
+      "value": "coconut",
+      "label": "Coconut",
+      "labelbn": "নারকেল",
+      "season": ["year-round"],
+      "category": "fruit"
+    },
+    {
+      "value": "fish",
+      "label": "Fish (Aquaculture)",
+      "labelbn": "মাছ",
+      "season": ["year-round"],
+      "category": "aquaculture"
+    },
+    {
+      "value": "prawn",
+      "label": "Prawn (Aquaculture)",
+      "labelbn": "চিংড়ি",
+      "season": ["year-round"],
+      "category": "aquaculture"
+    },
+    {
+      "value": "cattle",
+      "label": "Cattle (Dairy)",
+      "labelbn": "গরু",
+      "season": ["year-round"],
+      "category": "livestock"
+    },
+    {
+      "value": "chicken",
+      "label": "Chicken (Poultry)",
+      "labelbn": "মুরগি",
+      "season": ["year-round"],
+      "category": "livestock"
+    },
+    {
+      "value": "duck",
+      "label": "Duck (Poultry)",
+      "labelbn": "হাঁস",
+      "season": ["year-round"],
+      "category": "livestock"
+    }
+  ],
+  "farmTypes": [
+    {
+      "value": "vegetable",
+      "label": "Vegetable Farm",
+      "labelbn": "সবজি খামার"
+    },
+    { "value": "rice", "label": "Rice Farm", "labelbn": "ধান খামার" },
+    { "value": "fruit", "label": "Fruit Farm", "labelbn": "ফল খামার" },
+    { "value": "mixed", "label": "Mixed Farm", "labelbn": "মিশ্র খামার" },
+    { "value": "aquaculture", "label": "Aquaculture", "labelbn": "জলজ পালন" },
+    { "value": "dairy", "label": "Dairy Farm", "labelbn": "দুগ্ধ খামার" },
+    { "value": "poultry", "label": "Poultry Farm", "labelbn": "পোল্ট্রি খামার" }
+  ]
+}

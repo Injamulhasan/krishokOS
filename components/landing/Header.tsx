@@ -8,6 +8,7 @@ export type Language = "bn" | "en";
 interface HeaderProps {
   language: Language;
   onLanguageChange: (language: Language) => void;
+  onStartClick: () => void;
 }
 
 const navLinks: Record<Language, { href: string; label: string }[]> = {
@@ -38,7 +39,11 @@ const startButtonLabel: Record<Language, string> = {
   en: "Get Started",
 };
 
-export default function Header({ language, onLanguageChange }: HeaderProps) {
+export default function Header({
+  language,
+  onLanguageChange,
+  onStartClick,
+}: HeaderProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
@@ -94,7 +99,10 @@ export default function Header({ language, onLanguageChange }: HeaderProps) {
             </button>
           </div>
 
-          <Button className="rounded-full bg-[#00963E] px-6">
+          <Button
+            className="rounded-full bg-[#00963E] px-6"
+            onClick={onStartClick}
+          >
             {startButtonLabel[language]}
           </Button>
 

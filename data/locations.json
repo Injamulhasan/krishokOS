@@ -1,0 +1,201 @@
+{
+  "districts": [
+    {
+      "id": "barisal",
+      "name": "Barisal",
+      "namebn": "বরিশাল",
+      "upazilas": [
+        {
+          "id": "barisal_city",
+          "name": "Barisal City",
+          "namebn": "বরিশাল সিটি",
+          "unions": [
+            "Barisal Sadar",
+            "Amlabad",
+            "Bakerganj",
+            "Gaurala",
+            "Hizla"
+          ]
+        },
+        {
+          "id": "pirojpur",
+          "name": "Pirojpur",
+          "namebn": "পিরোজপুর",
+          "unions": [
+            "Pirojpur Sadar",
+            "Bhandaria",
+            "Dashmina",
+            "Indurkani",
+            "Kawkhali",
+            "Mathbaria",
+            "Nesarhat",
+            "Tajummill"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chittagong",
+      "name": "Chittagong",
+      "namebn": "চট্টগ্রাম",
+      "upazilas": [
+        {
+          "id": "chittagong_city",
+          "name": "Chittagong City",
+          "namebn": "চট্টগ্রাম সিটি",
+          "unions": [
+            "Chittagong Sadar",
+            "Bayazid",
+            "Anderkilla",
+            "Kotwali",
+            "Double Mooring",
+            "Panchlaish",
+            "Nasirabad"
+          ]
+        },
+        {
+          "id": "cox_bazar",
+          "name": "Cox's Bazar",
+          "namebn": "কক্স বাজার",
+          "unions": [
+            "Cox's Bazar Sadar",
+            "Chakaria",
+            "Kutubdia",
+            "Maheshkhali",
+            "Ramu",
+            "Teknaf"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dhaka",
+      "name": "Dhaka",
+      "namebn": "ঢাকা",
+      "upazilas": [
+        {
+          "id": "dhaka_city",
+          "name": "Dhaka City",
+          "namebn": "ঢাকা সিটি",
+          "unions": [
+            "Dhaka Sadar",
+            "Motijheel",
+            "Kawran Bazar",
+            "Gulshan",
+            "Banani",
+            "Mirpur",
+            "Uttara"
+          ]
+        },
+        {
+          "id": "gazipur",
+          "name": "Gazipur",
+          "namebn": "গাজীপুর",
+          "unions": [
+            "Gazipur Sadar",
+            "Kaliganj",
+            "Kaliakair",
+            "Kapasia",
+            "Sreepur"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "khulna",
+      "name": "Khulna",
+      "namebn": "খুলনা",
+      "upazilas": [
+        {
+          "id": "khulna_city",
+          "name": "Khulna City",
+          "namebn": "খুলনা সিটি",
+          "unions": [
+            "Khulna Sadar",
+            "Dautiakandi",
+            "Fisheries Ghat",
+            "Kotwali",
+            "Khulna Port",
+            "Labsa",
+            "Shiromoni"
+          ]
+        },
+        {
+          "id": "bagerhat",
+          "name": "Bagerhat",
+          "namebn": "বাগেরহাট",
+          "unions": [
+            "Bagerhat Sadar",
+            "Chitalmari",
+            "Fakirhat",
+            "Kachua",
+            "Mollahat",
+            "Morrelganj",
+            "Rampal",
+            "Sarankhola"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rajshahi",
+      "name": "Rajshahi",
+      "namebn": "রাজশাহী",
+      "upazilas": [
+        {
+          "id": "rajshahi_city",
+          "name": "Rajshahi City",
+          "namebn": "রাজশাহী সিটি",
+          "unions": [
+            "Rajshahi Sadar",
+            "Boalia",
+            "Katakhali",
+            "Motihar",
+            "Rajshahi Port",
+            "Shibganj"
+          ]
+        },
+        {
+          "id": "naogaon",
+          "name": "Naogaon",
+          "namebn": "নওগাঁ",
+          "unions": [
+            "Naogaon Sadar",
+            "Atrai",
+            "Badalgachhi",
+            "Manda",
+            "Patnitala",
+            "Porsha",
+            "Raninagar"
+          ]
+        }
+      ]
+    }
+  ],
+  "soilTypes": [
+    { "value": "clay", "label": "Clay", "labelbn": "দোআঁশ মাটি" },
+    { "value": "sandy", "label": "Sandy", "labelbn": "বালুকাময় মাটি" },
+    { "value": "loam", "label": "Loam", "labelbn": "লোম মাটি" },
+    { "value": "silt", "label": "Silt", "labelbn": "পলি মাটি" },
+    { "value": "peat", "label": "Peat", "labelbn": "পিট মাটি" },
+    { "value": "mixed", "label": "Mixed", "labelbn": "মিশ্র মাটি" }
+  ],
+  "waterSources": [
+    { "value": "tube-well", "label": "Tube Well", "labelbn": "নলকূপ" },
+    {
+      "value": "surface-water",
+      "label": "Surface Water",
+      "labelbn": "পৃষ্ঠ জল"
+    },
+    { "value": "rainwater", "label": "Rainwater", "labelbn": "বৃষ্টির পানি" },
+    { "value": "canal", "label": "Canal", "labelbn": "খাল" },
+    { "value": "pond", "label": "Pond", "labelbn": "পুকুর" },
+    { "value": "river", "label": "River", "labelbn": "নদী" },
+    { "value": "mixed", "label": "Mixed", "labelbn": "মিশ্র উৎস" }
+  ],
+  "areaUnits": [
+    { "value": "decimal", "label": "Decimal", "labelbn": "দশমিক" },
+    { "value": "bigha", "label": "Bigha", "labelbn": "বিঘা" },
+    { "value": "katha", "label": "Katha", "labelbn": "কাঠা" }
+  ]
+}
