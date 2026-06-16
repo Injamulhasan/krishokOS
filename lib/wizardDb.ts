@@ -4,10 +4,14 @@
  */
 
 import { randomBytes } from "crypto";
-import { readFile, writeFile } from "fs/promises";
+import { readFile, writeFile, mkdir } from "fs/promises";
 import path from "path";
 
-const DATA_DIR = path.join(process.cwd(), "data");
+const isServerless =
+  process.env.VERCEL === "1" ||
+  process.env.NODE_ENV === "production" ||
+  process.cwd().includes("/var/task");
+const DATA_DIR = isServerless ? "/tmp" : path.join(process.cwd(), "data");
 
 interface Farmer {
   id: string;
@@ -67,6 +71,20 @@ async function ensureFileExists(
   try {
     await readFile(filePath);
   } catch {
+    await mkdir(path.dirname(filePath), { recursive: true });
+    // If it fails, check if we are in serverless mode (i.e. filePath is in /tmp)
+    // and if there's a template file in the original data directory.
+    if (filePath.startsWith("/tmp")) {
+      const filename = path.basename(filePath);
+      const originalPath = path.join(process.cwd(), "data", filename);
+      try {
+        const contents = await readFile(originalPath, "utf8");
+        await writeFile(filePath, contents, "utf8");
+        return;
+      } catch (err) {
+        // Fallback to initialData
+      }
+    }
     await writeFile(filePath, JSON.stringify(initialData, null, 2));
   }
 }
@@ -168,6 +186,7 @@ export async function saveWizardStep(
   stepData: any,
 ): Promise<WizardProgress> {
   const wizardProgressPath = path.join(DATA_DIR, "wizard-progress.json");
+  await ensureFileExists(wizardProgressPath, []);
   const data = await readFile(wizardProgressPath, "utf-8");
   const wizardProgress: WizardProgress[] = JSON.parse(data);
 

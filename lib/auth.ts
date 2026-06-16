@@ -3,8 +3,8 @@ import fs from "fs/promises";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import path from "path";
+import { ensureWritableFile } from "./dbHelper";
 
-const USERS_FILE = path.join(process.cwd(), "data", "users.json");
 const AUTH_SECRET = process.env.AUTH_SECRET ?? "krishokos-local-secret";
 const SESSION_COOKIE_NAME = "krishokos-session";
 
@@ -52,7 +52,8 @@ function createSignature(value: string) {
 
 export async function readUsers(): Promise<User[]> {
   try {
-    const contents = await fs.readFile(USERS_FILE, "utf8");
+    const filePath = await ensureWritableFile("users.json", []);
+    const contents = await fs.readFile(filePath, "utf8");
     return JSON.parse(contents) as User[];
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") {
@@ -63,8 +64,8 @@ export async function readUsers(): Promise<User[]> {
 }
 
 export async function writeUsers(users: User[]) {
-  await fs.mkdir(path.dirname(USERS_FILE), { recursive: true });
-  await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+  const filePath = await ensureWritableFile("users.json", []);
+  await fs.writeFile(filePath, JSON.stringify(users, null, 2), "utf8");
 }
 
 export async function hashPassword(password: string) {
