@@ -11,7 +11,6 @@ export function getWritableFilePath(filename: string): string {
   // The process.cwd() usually includes /var/task on Vercel.
   const isServerless =
     process.env.VERCEL === "1" ||
-    process.env.NODE_ENV === "production" ||
     process.cwd().includes("/var/task");
 
   if (isServerless) {
