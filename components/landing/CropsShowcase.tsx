@@ -52,10 +52,10 @@ export default function CropsShowcase({ language }: { language: Language }) {
   return (
     <section className="mx-auto max-w-[1280px] px-4 py-20 sm:px-6">
       <div className="mb-12 text-center">
-        <p className="mb-3 text-xs uppercase tracking-[4px] text-green-700">
+        <p className="mb-3 text-xs uppercase tracking-[4px] text-green-700 dark:text-green-500">
           {language === "en" ? "Popular Crops" : "জনপ্রিয় ফসল"}
         </p>
-        <h2 className="text-3xl font-medium sm:text-5xl">
+        <h2 className="text-3xl font-medium text-gray-900 dark:text-white sm:text-5xl">
           {language === "en" ? "Choose your crop" : "আপনার ফসল নির্বাচন করুন"}
         </h2>
       </div>

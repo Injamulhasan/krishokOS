@@ -257,16 +257,15 @@ const translations: Record<
     farmModel: {
       title: "70:30 Farm Model",
       description:
-        "A scientific approach combining root zone mulching, film feed, and VM sprays for residue-free and export-grade yields.",
+        "A scientific method combining root zone mulching, vitri compost, and VM spray for residue-free, export-ready yield.",
     },
     dream: {
       label: "Our Dream",
       quote:
-        '"Taking Bangladesh to global scale through tech-powered, safe, sustainable, and export-ready farming."',
+        '"To elevate Bangladesh agriculture to world-class standards through tech-driven, safe, sustainable, and export-ready farming."',
     },
     footer: {
-      about:
-        "A smart digital farm management platform for Bangladeshi farmers.",
+      about: "Smart digital farm management platform for Bangladeshi farmers.",
       links: [
         { href: "#modules", label: "Modules" },
         { href: "#assistant", label: "AI Assistant" },
@@ -279,57 +278,54 @@ const translations: Record<
       {
         icon: "🌿",
         title: "Organic Farming",
-        description: "Chemical-free, eco-friendly production methods.",
+        description: "Chemical-free eco-friendly production methods.",
       },
       {
         icon: "⚗️",
-        title: "Conventional Inputs",
-        description:
-          "Traditional farming with fertilizer and pesticide support.",
+        title: "Conventional Chemical",
+        description: "Traditional farming reliant on fertilizers and pesticides.",
       },
       {
         icon: "🌱",
         title: "Residue-Free",
-        description: "Safe, export-ready, residue-free production.",
+        description: "Safe and residue-free production for exports.",
       },
       {
         icon: "🔄",
         title: "Integrated (IPM)",
-        description: "Scientific balance of organic and chemical inputs.",
+        description: "Scientific integration of organic and chemical methods.",
       },
     ],
     platformFeatures: [
       {
         icon: "✦",
-        title: "Intelligent Farm Planning",
-        description:
-          "Seed choice, irrigation, input, cost and profit planning in one system.",
+        title: "Smart Farm Planning",
+        description: "Complete planning of seed selection, irrigation, fertilizer, cost and profit.",
       },
       {
         icon: "⟳",
         title: "AI Disease Detection",
-        description:
-          "Capture leaf, fruit or stem images for instant treatment guidance.",
+        description: "Take photos of leaves, fruits, or stems and get instant solutions.",
       },
       {
         icon: "🗓",
-        title: "Crop Calendar & Advice",
-        description: "Weekly weather-adjusted task schedules.",
+        title: "Crop Calendar & Tips",
+        description: "Weekly weather-integrated task list.",
       },
       {
         icon: "🛡",
-        title: "Traceability & Export Ready",
-        description: "Record every step from field to buyer.",
+        title: "Traceability & Export Prep",
+        description: "Records of every stage from field to buyer.",
       },
       {
         icon: "💳",
         title: "Financial Tracking",
-        description: "Cost, revenue, profit-loss and ROI per acre.",
+        description: "Tracking costs, revenues, profit-loss, and ROI per acre.",
       },
       {
         icon: "💬",
-        title: "AI Farm Advisor",
-        description: "Ask questions in Bengali and get data-driven answers.",
+        title: "AI Agri Expert",
+        description: "Ask questions in Bangla or English and get facts-based answers.",
       },
     ],
     aiCards: [
@@ -343,18 +339,18 @@ const translations: Record<
       "Irrigation Schedule",
       "Disease Detection",
       "Yield Forecast",
-      "Cost-Profit",
+      "Cost-Benefit",
       "Export Score",
     ],
     farmSetupItems: [
       "Crop Selection",
-      "Field Setup",
-      "Soil Profile",
-      "Soil Testing",
+      "Crop Setup",
+      "Land Profile",
+      "Soil Analysis",
       "Irrigation Plan",
-      "Input Management",
-      "Pest Monitoring",
-      "Crop Care",
+      "Fertilizer Management",
+      "Disease Monitoring",
+      "Fruit Care",
       "Harvest",
       "Packaging",
       "Marketing",
@@ -363,8 +359,8 @@ const translations: Record<
       { icon: "🚜", title: "Land Prep" },
       { icon: "🌱", title: "Planting" },
       { icon: "💧", title: "Irrigation" },
-      { icon: "🔬", title: "Disease Detection" },
-      { icon: "🍃", title: "Crop Care" },
+      { icon: "🔬", title: "Disease Detect" },
+      { icon: "🍃", title: "Fruit Care" },
       { icon: "📦", title: "Harvest" },
       { icon: "🏪", title: "Market" },
       { icon: "🌍", title: "Export" },
@@ -373,20 +369,16 @@ const translations: Record<
 };
 
 export default function LandingPage() {
-  const [language, setLanguage] = useState<Language>("bn");
   const router = useRouter();
+  const [language, setLanguage] = useState<Language>("bn");
   const locale = translations[language];
 
-  useEffect(() => {
-    document.documentElement.lang = language;
-  }, [language]);
-
   const handleStartClick = () => {
-    router.push("/auth/signin");
+    router.push("/auth");
   };
 
   return (
-    <div className="min-h-screen bg-[#F7F4EE] text-[#0f2416]">
+    <div className="min-h-screen bg-[#F7F4EE] text-[#0f2416] dark:bg-[#081009] dark:text-[#e2ede4] transition-colors duration-300">
       <Header
         language={language}
         onLanguageChange={setLanguage}
@@ -405,13 +397,13 @@ export default function LandingPage() {
         id="methods"
       >
         <div className="mb-14 text-center">
-          <p className="mb-3 text-xs uppercase tracking-[4px] text-green-700">
+          <p className="mb-3 text-xs uppercase tracking-[4px] text-green-700 dark:text-green-500 font-bold">
             {locale.methods.label}
           </p>
-          <h2 className="text-3xl font-medium text-[#1C2B1F] sm:text-5xl">
+          <h2 className="text-3xl font-medium text-[#1C2B1F] dark:text-white sm:text-5xl">
             {locale.methods.title}
           </h2>
-          <p className="mx-auto mt-5 max-w-2xl text-lg text-gray-600">
+          <p className="mx-auto mt-5 max-w-2xl text-lg text-gray-600 dark:text-gray-400">
             {locale.methods.description}
           </p>
         </div>
@@ -420,18 +412,18 @@ export default function LandingPage() {
           {locale.cultivationMethods.map((item) => (
             <div
               key={item.title}
-              className="group rounded-[28px] border border-[#E8E1D5] bg-white p-8 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:border-green-200 hover:shadow-xl"
+              className="group rounded-[28px] border border-[#E8E1D5] dark:border-[#1d2f21] bg-white dark:bg-[#121c15] p-8 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:border-green-200 dark:hover:border-green-800 hover:shadow-xl"
             >
-              <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#F4F8F3] text-3xl transition group-hover:scale-110">
+              <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#F4F8F3] dark:bg-[#1b2b1d] text-3xl transition group-hover:scale-110">
                 {item.icon}
               </div>
-              <h3 className="mb-3 text-xl font-semibold text-[#1C2B1F]">
+              <h3 className="mb-3 text-xl font-semibold text-[#1C2B1F] dark:text-white">
                 {item.title}
               </h3>
-              <p className="leading-relaxed text-gray-600">
+              <p className="leading-relaxed text-gray-600 dark:text-gray-400">
                 {item.description}
               </p>
-              <div className="mt-6 h-[2px] w-12 bg-green-600 transition-all duration-300 group-hover:w-20" />
+              <div className="mt-6 h-[2px] w-12 bg-green-600 dark:bg-green-500 transition-all duration-300 group-hover:w-20" />
             </div>
           ))}
         </div>
@@ -442,13 +434,13 @@ export default function LandingPage() {
         id="platform"
       >
         <div className="mb-14">
-          <p className="mb-3 text-xs uppercase tracking-[4px] text-green-700">
+          <p className="mb-3 text-xs uppercase tracking-[4px] text-green-700 dark:text-green-500 font-bold">
             {locale.platform.label}
           </p>
-          <h2 className="text-4xl font-medium font-black leading-tight text-[#1C2B1F] sm:text-5xl lg:text-6xl">
+          <h2 className="text-4xl font-black leading-tight text-[#1C2B1F] dark:text-white sm:text-5xl lg:text-6xl">
             {locale.platform.title}
           </h2>
-          <p className="mt-5 max-w-2xl text-base leading-relaxed text-gray-600">
+          <p className="mt-5 max-w-2xl text-base leading-relaxed text-gray-600 dark:text-gray-400">
             {locale.platform.description}
           </p>
         </div>
@@ -457,15 +449,15 @@ export default function LandingPage() {
           {locale.platformFeatures.map((item) => (
             <div
               key={item.title}
-              className="group rounded-[24px] border border-[#E8E2D8] bg-white p-8 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+              className="group rounded-[24px] border border-[#E8E2D8] dark:border-[#1d2f21] bg-white dark:bg-[#121c15] p-8 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
             >
-              <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-green-100 text-xl text-green-700">
+              <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-green-100 dark:bg-green-950 text-xl text-green-700 dark:text-green-400">
                 {item.icon}
               </div>
-              <h3 className="mb-3 text-xl font-bold text-[#1C2B1F]">
+              <h3 className="mb-3 text-xl font-bold text-[#1C2B1F] dark:text-white">
                 {item.title}
               </h3>
-              <p className="leading-relaxed text-gray-500">
+              <p className="leading-relaxed text-gray-500 dark:text-gray-400">
                 {item.description}
               </p>
             </div>
@@ -477,10 +469,10 @@ export default function LandingPage() {
         className="mx-auto max-w-[1280px] px-4 py-10 sm:px-6"
         id="farm-model"
       >
-        <div className="overflow-hidden rounded-[36px] bg-gradient-to-br from-[#1C6B30] to-[#145222] p-10 text-white shadow-2xl sm:p-14">
+        <div className="overflow-hidden rounded-[36px] bg-gradient-to-br from-[#1C6B30] to-[#145222] p-10 text-white shadow-2xl sm:p-14 border border-transparent dark:border-[#1d2f21]">
           <div className="grid items-center gap-10 lg:grid-cols-2">
             <div>
-              <h2 className="text-5xl font-medium font-black leading-tight sm:text-6xl lg:text-6xl">
+              <h2 className="text-5xl font-black leading-tight sm:text-6xl lg:text-6xl">
                 {locale.farmModel.title}
               </h2>
               <p className="mt-6 max-w-md text-base leading-relaxed text-white/75">
@@ -491,7 +483,7 @@ export default function LandingPage() {
               {locale.modelButtons.map((label) => (
                 <button
                   key={label}
-                  className="rounded-2xl border border-white/25 bg-white/10 px-5 py-4 text-left text-sm font-medium text-white backdrop-blur transition hover:bg-white/20"
+                  className="rounded-2xl border border-white/25 bg-white/10 px-5 py-4 text-left text-sm font-medium text-white backdrop-blur-xs transition hover:bg-white/20 cursor-pointer"
                 >
                   {label}
                 </button>
@@ -501,31 +493,32 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="bg-[#EFE6D8] py-24" id="farm-setup">
+      <section className="bg-[#EFE6D8] dark:bg-[#0c130d] border-y border-transparent dark:border-[#1d2f21] py-24 transition-colors duration-300" id="farm-setup">
         <div className="mx-auto max-w-[1280px] px-4 sm:px-6">
           <div className="mb-16 text-center">
-            <p className="mb-3 text-xs uppercase tracking-[4px] text-green-700">
+            <p className="mb-3 text-xs uppercase tracking-[4px] text-green-700 dark:text-green-500 font-bold">
               {locale.farmSetup.badge}
             </p>
-            <h2 className="text-3xl font-medium sm:text-5xl">
+            <h2 className="text-3xl font-medium text-gray-900 dark:text-white sm:text-5xl">
               {locale.farmSetup.title}
             </h2>
-            <p className="mt-4 text-gray-600">{locale.farmSetup.description}</p>
+            <p className="mt-4 text-gray-600 dark:text-gray-400">{locale.farmSetup.description}</p>
           </div>
 
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {locale.farmSetupItems.map((item, index) => (
               <div
                 key={item}
-                className="rounded-[24px] bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+                className="rounded-[24px] bg-white dark:bg-[#121c15] border border-transparent dark:border-[#1d2f21] p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
               >
-                <div className="mb-4 text-green-700">
+                <div className="mb-4 text-green-700 dark:text-green-500 font-bold">
                   {(index + 1).toString().padStart(2, "0")}
                 </div>
-                <h3 className="text-lg font-bold">{item}</h3>
-                <p className="mt-3 text-sm text-gray-600">
-                  কৃষকOS এই ধাপের জন্য প্রয়োজনীয় নির্দেশনা ও ট্র্যাকিং প্রদান
-                  করে।
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white">{item}</h3>
+                <p className="mt-3 text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                  {language === "bn"
+                    ? "কৃষকOS এই ধাপের জন্য প্রয়োজনীয় নির্দেশনা ও ট্র্যাকিং প্রদান করে।"
+                    : "KriShokOS provides guidelines and tracking for this setup stage."}
                 </p>
               </div>
             ))}
@@ -534,27 +527,27 @@ export default function LandingPage() {
       </section>
 
       <section
-        className="relative overflow-hidden bg-[#F8F6F0] py-28"
+        className="relative overflow-hidden bg-[#F8F6F0] dark:bg-[#081009] py-28 transition-colors duration-300"
         id="vision"
       >
-        <div className="absolute left-0 top-0 h-96 w-96 rounded-full bg-green-100/40 blur-3xl" />
-        <div className="absolute bottom-0 right-0 h-96 w-96 rounded-full bg-amber-100/40 blur-3xl" />
+        <div className="absolute left-0 top-0 h-96 w-96 rounded-full bg-green-100/40 dark:bg-green-950/20 blur-3xl" />
+        <div className="absolute bottom-0 right-0 h-96 w-96 rounded-full bg-amber-100/40 dark:bg-amber-950/10 blur-3xl" />
 
         <div className="relative mx-auto max-w-[1280px] px-4 sm:px-6">
           <div className="mx-auto mb-20 max-w-3xl text-center">
-            <p className="mb-4 text-xs uppercase tracking-[5px] text-green-700">
+            <p className="mb-4 text-xs uppercase tracking-[5px] text-green-700 dark:text-green-500 font-bold">
               {locale.vision.journey}
             </p>
-            <h2 className="text-4xl font-medium leading-tight text-[#1C2B1F] sm:text-6xl">
+            <h2 className="text-4xl font-medium leading-tight text-[#1C2B1F] dark:text-white sm:text-6xl">
               {locale.vision.title}
             </h2>
-            <p className="mt-5 text-lg text-gray-600">
+            <p className="mt-5 text-lg text-gray-600 dark:text-gray-400">
               {locale.vision.description}
             </p>
           </div>
 
           <div className="relative">
-            <div className="absolute left-1/2 top-0 hidden h-full w-[2px] -translate-x-1/2 bg-gradient-to-b from-green-200 via-green-400 to-green-200 lg:block" />
+            <div className="absolute left-1/2 top-0 hidden h-full w-[2px] -translate-x-1/2 bg-gradient-to-b from-green-200 via-green-400 to-green-200 dark:from-green-900 dark:via-green-700 dark:to-green-900 lg:block" />
             {locale.journeySteps.map((step, index) => (
               <div
                 key={step.title}
@@ -563,26 +556,26 @@ export default function LandingPage() {
                 }`}
               >
                 <div className="w-full lg:w-[46%]">
-                  <div className="group rounded-[32px] border border-[#E7E1D6] bg-white p-8 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                  <div className="group rounded-[32px] border border-[#E7E1D6] dark:border-[#1d2f21] bg-white dark:bg-[#121c15] p-8 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
                     <div className="mb-6 flex items-center justify-between">
-                      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#F4F8F3] text-3xl">
+                      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#F4F8F3] dark:bg-[#1b2b1d] text-3xl">
                         {step.icon}
                       </div>
-                      <div className="rounded-full bg-green-50 px-4 py-2 text-sm font-medium text-green-700">
+                      <div className="rounded-full bg-green-50 dark:bg-green-950 px-4 py-2 text-sm font-medium text-green-700 dark:text-green-400">
                         {locale.vision.stepsLabel}{" "}
                         {(index + 1).toString().padStart(2, "0")}
                       </div>
                     </div>
-                    <h3 className="text-2xl font-semibold text-[#1C2B1F]">
+                    <h3 className="text-2xl font-semibold text-[#1C2B1F] dark:text-white">
                       {step.title}
                     </h3>
-                    <p className="mt-3 leading-relaxed text-gray-600">
+                    <p className="mt-3 leading-relaxed text-gray-600 dark:text-gray-400">
                       {locale.vision.stepDescription}
                     </p>
                   </div>
                 </div>
                 <div className="absolute left-1/2 hidden -translate-x-1/2 lg:block">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full border-4 border-[#F8F6F0] bg-green-700 shadow-lg">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full border-4 border-[#F8F6F0] dark:border-[#081009] bg-green-700 shadow-lg">
                     <div className="h-2 w-2 rounded-full bg-white" />
                   </div>
                 </div>
@@ -590,7 +583,7 @@ export default function LandingPage() {
             ))}
           </div>
 
-          <div className="mt-20 rounded-[36px] bg-gradient-to-r from-[#0F5D2C] to-[#1A7A3E] p-10 text-white shadow-2xl sm:p-14">
+          <div className="mt-20 rounded-[36px] bg-gradient-to-r from-[#0F5D2C] to-[#1A7A3E] p-10 text-white shadow-2xl sm:p-14 border border-transparent dark:border-[#1d2f21]">
             <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
               <div>
                 <p className="mb-3 text-sm uppercase tracking-[3px] text-green-100">
@@ -617,7 +610,7 @@ export default function LandingPage() {
                   <div className="text-5xl font-bold">
                     {locale.vision.workflowMetrics.ai.value}
                   </div>
-                  <div className="text-sm text-green-100">
+                  <div className="text-sm text-green-100 font-medium">
                     {locale.vision.workflowMetrics.ai.label}
                   </div>
                 </div>
@@ -625,7 +618,7 @@ export default function LandingPage() {
                   <div className="text-5xl font-bold">
                     {locale.vision.workflowMetrics.erp.value}
                   </div>
-                  <div className="text-sm text-green-100">
+                  <div className="text-sm text-green-100 font-medium">
                     {locale.vision.workflowMetrics.erp.label}
                   </div>
                 </div>
@@ -641,16 +634,16 @@ export default function LandingPage() {
       >
         <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
           <div>
-            <p className="mb-3 text-xs uppercase tracking-[4px] text-green-700">
-              {locale.assistant.title}
+            <p className="mb-3 text-xs uppercase tracking-[4px] text-green-700 dark:text-green-500 font-bold">
+              {language === "en" ? "AI Assistant" : "AI সহকারী"}
             </p>
-            <h2 className="text-3xl font-medium sm:text-5xl">
+            <h2 className="text-3xl font-medium text-gray-900 dark:text-white sm:text-5xl">
               {locale.assistant.title}
             </h2>
-            <p className="mt-4 text-lg text-gray-600">
+            <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
               {locale.assistant.description}
             </p>
-            <button className="mt-8 rounded-full bg-green-700 px-8 py-4 text-white shadow-lg transition hover:bg-green-800">
+            <button className="mt-8 rounded-full bg-green-700 hover:bg-green-800 text-white shadow-lg transition px-8 py-4 font-bold cursor-pointer">
               {locale.assistant.button}
             </button>
           </div>
@@ -658,33 +651,36 @@ export default function LandingPage() {
             {locale.aiCards.map((card) => (
               <div
                 key={card.subtitle}
-                className="rounded-[28px] border border-[#E8E1D5] bg-white p-6 shadow-sm"
+                className="rounded-[28px] border border-[#E8E1D5] dark:border-[#1d2f21] bg-white dark:bg-[#121c15] p-6 shadow-sm"
               >
                 <div className="mb-4 text-3xl">{card.emoji}</div>
-                <h3 className="text-xl font-semibold">{card.title}</h3>
-                <p className="mt-2 text-sm text-gray-500">{card.subtitle}</p>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">{card.title}</h3>
+                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">{card.subtitle}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="bg-[#F2E7D8] py-24" id="cta">
+      <section className="bg-[#F2E7D8] dark:bg-[#0c130d] border-t border-transparent dark:border-[#1d2f21] py-24 transition-colors duration-300" id="cta">
         <div className="mx-auto max-w-[1280px] px-4 sm:px-6">
-          <div className="rounded-[32px] bg-white p-12 shadow-xl sm:p-16">
+          <div className="rounded-[32px] bg-white dark:bg-[#121c15] p-12 shadow-xl sm:p-16 border border-transparent dark:border-[#1d2f21]">
             <div className="grid gap-8 lg:grid-cols-2 lg:items-center">
               <div>
-                <p className="text-sm uppercase tracking-[4px] text-green-700">
+                <p className="text-sm uppercase tracking-[4px] text-green-700 dark:text-green-500 font-bold">
                   {locale.platform.label}
                 </p>
-                <h2 className="mt-4 text-4xl font-semibold text-[#1c2b1f] sm:text-5xl">
+                <h2 className="mt-4 text-4xl font-semibold text-[#1c2b1f] dark:text-white sm:text-5xl">
                   {locale.cta.title}
                 </h2>
-                <p className="mt-6 text-lg text-gray-600">
+                <p className="mt-6 text-lg text-gray-600 dark:text-gray-400">
                   {locale.cta.subtitle}
                 </p>
               </div>
-              <button className="self-start rounded-full bg-green-700 px-10 py-4 text-white shadow-lg transition hover:bg-green-800">
+              <button
+                className="self-start rounded-full bg-green-700 hover:bg-green-800 px-10 py-4 text-white font-bold shadow-lg transition cursor-pointer"
+                onClick={handleStartClick}
+              >
                 {locale.cta.button}
               </button>
             </div>
@@ -692,28 +688,28 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <footer className="border-t border-[#E8E1D5] bg-white py-12">
+      <footer className="border-t border-[#E8E1D5] dark:border-[#1d2f21] bg-white dark:bg-[#081009] py-12 transition-colors duration-300">
         <div className="mx-auto flex max-w-[1280px] flex-col gap-6 px-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-lg font-semibold">{locale.dream.label}</p>
-            <p className="mt-2 max-w-xl text-gray-600">{locale.dream.quote}</p>
+            <p className="text-lg font-semibold text-gray-900 dark:text-white">{locale.dream.label}</p>
+            <p className="mt-2 max-w-xl text-gray-600 dark:text-gray-400">{locale.dream.quote}</p>
           </div>
           <div className="flex flex-wrap gap-4">
             {locale.footer.links.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
-                className="text-sm text-gray-600 transition hover:text-green-700"
+                className="text-sm text-gray-600 dark:text-gray-400 transition hover:text-green-700 dark:hover:text-green-500"
               >
                 {link.label}
               </a>
             ))}
           </div>
         </div>
-        <div className="mx-auto mt-10 max-w-[1280px] px-4 sm:px-6 text-sm text-gray-500">
+        <div className="mx-auto mt-10 max-w-[1280px] px-4 sm:px-6 text-sm text-gray-500 dark:text-gray-400">
           {locale.footer.about}
         </div>
-        <div className="mx-auto mt-4 max-w-[1280px] px-4 sm:px-6 text-sm text-gray-400">
+        <div className="mx-auto mt-4 max-w-[1280px] px-4 sm:px-6 text-sm text-gray-400 dark:text-gray-500">
           {locale.footer.copyright}
         </div>
       </footer>

@@ -76,10 +76,10 @@ export default function WizardClient({ user }: WizardClientProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 dark:from-[#081009] dark:to-[#0b130c] flex items-center justify-center transition-colors duration-300">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <p className="text-gray-700">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 dark:border-emerald-500 mx-auto mb-4"></div>
+          <p className="text-gray-700 dark:text-gray-300 font-semibold">
             {language === "bn" ? "লোড করছি..." : "Loading..."}
           </p>
         </div>
@@ -89,12 +89,12 @@ export default function WizardClient({ user }: WizardClientProps) {
 
   if (wizardError) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center">
-        <div className="bg-white rounded-lg shadow-md p-8 max-w-md">
-          <p className="text-red-600 font-semibold mb-4">{wizardError}</p>
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 dark:from-[#081009] dark:to-[#0b130c] flex items-center justify-center transition-colors duration-300">
+        <div className="bg-white dark:bg-[#121c15] rounded-lg shadow-md border dark:border-emerald-900/40 p-8 max-w-md">
+          <p className="text-red-600 dark:text-red-400 font-semibold mb-4">{wizardError}</p>
           <button
             onClick={() => router.push("/")}
-            className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-lg"
+            className="w-full bg-green-600 dark:bg-emerald-600 hover:bg-green-700 dark:hover:bg-emerald-700 text-white font-semibold py-2 rounded-lg cursor-pointer"
           >
             {language === "bn" ? "হোম এ ফিরুন" : "Go Home"}
           </button>

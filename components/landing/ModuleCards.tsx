@@ -52,10 +52,10 @@ export default function ModuleCards({ language }: { language: Language }) {
   return (
     <section className="mx-auto max-w-[1280px] px-4 py-24 sm:px-6">
       <div className="mb-12">
-        <p className="mb-3 text-xs uppercase tracking-[4px] text-green-700">
+        <p className="mb-3 text-xs uppercase tracking-[4px] text-green-700 dark:text-green-500">
           {language === "en" ? "Modules" : "মডিউল"}
         </p>
-        <h2 className="text-4xl font-black leading-tight text-[#1C2B1F] sm:text-5xl lg:text-6xl">
+        <h2 className="text-4xl font-black leading-tight text-[#1C2B1F] dark:text-white sm:text-5xl lg:text-6xl">
           {language === "en"
             ? "Three Sectors, One Platform"
             : "তিনটি খাত, এক প্ল্যাটফর্ম"}
@@ -66,20 +66,20 @@ export default function ModuleCards({ language }: { language: Language }) {
         {cards.map((card) => (
           <div
             key={card.title}
-            className="rounded-[24px] border border-[#E8E2D8] bg-white p-8 shadow-sm"
+            className="rounded-[24px] border border-[#E8E2D8] dark:border-[#1d2f21] bg-white dark:bg-[#121c15] p-8 shadow-sm transition-all duration-300"
           >
             <div className="mb-6 text-4xl">{card.emoji}</div>
-            <h3 className="mb-2 text-2xl font-black text-[#1C2B1F]">
+            <h3 className="mb-2 text-2xl font-black text-[#1C2B1F] dark:text-white">
               {card.title}
             </h3>
-            <p className="mb-8 leading-relaxed text-gray-500">
+            <p className="mb-8 leading-relaxed text-gray-500 dark:text-gray-400">
               {card.description}
             </p>
             <span
               className={`inline-flex items-center rounded-full px-4 py-2 text-xs font-semibold ${
                 card.active
                   ? "gap-2 bg-[#1C6B30] text-white"
-                  : "border border-[#D5CCBF] text-gray-500"
+                  : "border border-[#D5CCBF] dark:border-[#1d2f21] text-gray-500 dark:text-gray-400"
               }`}
             >
               {card.active && (
