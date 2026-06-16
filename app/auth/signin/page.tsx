@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function SigninPage() {
   const router = useRouter();
@@ -49,73 +50,78 @@ export default function SigninPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F8F4] text-[#1C2B1F]">
+    <div className="min-h-screen bg-[#F8F8F4] dark:bg-[#081009] text-[#1C2B1F] dark:text-[#e2ede4] transition-colors duration-300">
       <div className="mx-auto flex min-h-screen max-w-3xl flex-col justify-center px-6 py-16">
-        <div className="rounded-[32px] border border-[#D9DFC8] bg-white p-10 shadow-lg">
+        {/* Floating ThemeToggle */}
+        <div className="flex justify-end mb-4">
+          <ThemeToggle />
+        </div>
+
+        <div className="rounded-[32px] border border-[#D9DFC8] dark:border-emerald-900/40 bg-white dark:bg-[#121c15] p-10 shadow-lg transition-colors duration-300">
           <div className="mb-8">
-            <p className="text-sm uppercase tracking-[0.3em] text-[#00963F]">
+            <p className="text-sm uppercase tracking-[0.3em] text-[#00963F] dark:text-emerald-400 font-bold">
               Sign In
             </p>
-            <h1 className="mt-4 text-3xl font-black sm:text-4xl">
+            <h1 className="mt-4 text-3xl font-black sm:text-4xl text-[#1C2B1F] dark:text-[#e2ede4]">
               Access your account
             </h1>
-            <p className="mt-3 text-base leading-7 text-[#4B5A44]">
+            <p className="mt-3 text-base leading-7 text-[#4B5A44] dark:text-gray-400">
               Sign in with your email or phone and continue to your dashboard.
             </p>
           </div>
 
           <form className="space-y-6" onSubmit={handleSubmit}>
             <label className="block">
-              <span className="text-sm font-medium text-[#1C2B1F]">
+              <span className="text-sm font-medium text-[#1C2B1F] dark:text-emerald-400">
                 Email or phone
               </span>
               <input
                 value={identifier}
                 onChange={(event) => setIdentifier(event.target.value)}
-                className="mt-2 w-full rounded-3xl border border-[#D7D7D7] bg-[#F8F8F4] px-4 py-3 outline-none focus:border-[#00963F] focus:ring-2 focus:ring-[#B4E6B8]"
+                className="mt-2 w-full rounded-3xl border border-[#D7D7D7] dark:border-emerald-900/40 bg-[#F8F8F4] dark:bg-[#081009] dark:text-[#e2ede4] px-4 py-3 outline-none focus:border-[#00963F] dark:focus:border-emerald-500 focus:ring-2 focus:ring-[#B4E6B8] focus:dark:ring-emerald-950/60"
                 placeholder="you@example.com or 01XXXXXXXXX"
               />
             </label>
             <label className="block">
-              <span className="text-sm font-medium text-[#1C2B1F]">
+              <span className="text-sm font-medium text-[#1C2B1F] dark:text-emerald-400">
                 Password
               </span>
               <input
                 type="password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
-                className="mt-2 w-full rounded-3xl border border-[#D7D7D7] bg-[#F8F8F4] px-4 py-3 outline-none focus:border-[#00963F] focus:ring-2 focus:ring-[#B4E6B8]"
+                className="mt-2 w-full rounded-3xl border border-[#D7D7D7] dark:border-emerald-900/40 bg-[#F8F8F4] dark:bg-[#081009] dark:text-[#e2ede4] px-4 py-3 outline-none focus:border-[#00963F] dark:focus:border-emerald-500 focus:ring-2 focus:ring-[#B4E6B8] focus:dark:ring-emerald-950/60"
                 placeholder="Your password"
               />
             </label>
 
-            {error ? <p className="text-sm text-destructive">{error}</p> : null}
+            {error ? <p className="text-sm text-destructive dark:text-red-400 font-semibold">{error}</p> : null}
             {message ? (
-              <p className="text-sm text-[#00963F]">{message}</p>
+              <p className="text-sm text-[#00963F] dark:text-emerald-400 font-semibold">{message}</p>
             ) : null}
 
             <button
               type="submit"
               disabled={loading}
-              className="inline-flex w-full items-center justify-center rounded-full bg-[#00963E] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#007d2d] disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex w-full items-center justify-center rounded-full bg-[#00963E] dark:bg-emerald-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#007d2d] dark:hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
             >
               {loading ? "Signing in..." : "Sign in"}
             </button>
           </form>
 
-          <div className="mt-6 flex flex-col gap-3 border-t border-[#E7E9E2] pt-6 text-sm text-[#4B5A44] sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-6 flex flex-col gap-3 border-t border-[#E7E9E2] dark:border-emerald-900/40 pt-6 text-sm text-[#4B5A44] dark:text-gray-400 sm:flex-row sm:items-center sm:justify-between">
             <p>
               Need a new account?{" "}
               <Link
                 href="/auth/signup"
-                className="font-semibold text-[#00963F] hover:underline"
+                className="font-semibold text-[#00963F] dark:text-emerald-400 hover:underline"
               >
                 Sign up
               </Link>
             </p>
             <Link
               href="/auth/forgot-password"
-              className="font-semibold text-[#00963F] hover:underline"
+              className="font-semibold text-[#00963F] dark:text-emerald-400 hover:underline"
             >
               Forgot password?
             </Link>
