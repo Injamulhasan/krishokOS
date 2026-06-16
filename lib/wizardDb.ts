@@ -360,4 +360,32 @@ export async function getFarmByFarmerId(
   return farms.find((f) => f.farmerId === farmerId) || null;
 }
 
+export async function updateFarmerProfile(
+  userId: string,
+  update: { fullName: string; phone: string; email: string }
+): Promise<Farmer | null> {
+  const farmersPath = path.join(DATA_DIR, "farmers.json");
+  await ensureFileExists(farmersPath, []);
+
+  const data = await readFile(farmersPath, "utf-8");
+  const farmers: Farmer[] = JSON.parse(data);
+
+  const farmerIndex = farmers.findIndex((f) => f.userId === userId);
+  if (farmerIndex === -1) {
+    return null;
+  }
+
+  farmers[farmerIndex] = {
+    ...farmers[farmerIndex],
+    fullName: update.fullName,
+    phone: update.phone,
+    email: update.email,
+    updatedAt: Date.now(),
+  };
+
+  await writeFile(farmersPath, JSON.stringify(farmers, null, 2));
+  return farmers[farmerIndex];
+}
+
 export type { Farm, Farmer, WizardProgress };
+

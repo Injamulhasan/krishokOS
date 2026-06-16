@@ -326,3 +326,34 @@ export function signOutResponse() {
   });
   return response;
 }
+
+export async function updateUserProfile(
+  userId: string,
+  { name, email, phone }: { name: string; email: string; phone?: string }
+) {
+  const users = await readUsers();
+  const userIndex = users.findIndex((u) => u.id === userId);
+  if (userIndex === -1) {
+    throw new Error("User not found");
+  }
+
+  // Check if email is already taken by another user
+  const emailTaken = users.some(
+    (u) => u.id !== userId && u.email.toLowerCase() === email.toLowerCase()
+  );
+  if (emailTaken) {
+    throw new Error("Email already in use");
+  }
+
+  const user = users[userIndex];
+  user.name = name;
+  user.email = email.toLowerCase();
+  if (phone !== undefined) {
+    user.phone = phone.trim() || undefined;
+  }
+
+  users[userIndex] = user;
+  await writeUsers(users);
+  return user;
+}
+
