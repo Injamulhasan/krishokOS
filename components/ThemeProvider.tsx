@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 
 type Theme = "light" | "dark";
 
@@ -13,39 +13,41 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>("light");
-  const [mounted, setMounted] = useState(false);
 
+  // Read theme from localStorage or system preference on mount
   useEffect(() => {
-    // Read initial theme from localStorage or system preference
-    const storedTheme = localStorage.getItem("krishokos-theme") as Theme;
-    const initialTheme =
-      storedTheme ||
-      (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-
-    setTheme(initialTheme);
-    setMounted(true);
-
-    if (initialTheme === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
+    try {
+      const savedTheme = localStorage.getItem("krishokos-theme") as Theme | null;
+      if (savedTheme) {
+        setTheme(savedTheme);
+      } else {
+        const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        setTheme(systemPrefersDark ? "dark" : "light");
+      }
+    } catch (e) {
+      console.error("Failed to read theme preference", e);
     }
   }, []);
 
-  const toggleTheme = () => {
-    const nextTheme = theme === "light" ? "dark" : "light";
-    setTheme(nextTheme);
-    localStorage.setItem("krishokos-theme", nextTheme);
-
-    if (nextTheme === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
+  // Update theme class on HTML element when state changes
+  useEffect(() => {
+    try {
+      const root = window.document.documentElement;
+      if (theme === "dark") {
+        root.classList.add("dark");
+      } else {
+        root.classList.remove("dark");
+      }
+      localStorage.setItem("krishokos-theme", theme);
+    } catch (e) {
+      console.error("Failed to persist theme preference", e);
     }
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === "light" ? "dark" : "light"));
   };
 
-  // Render a fallback or simple markup before mounting to avoid hydration mismatches,
-  // but allow full SSR rendering to keep Next.js static page builders happy.
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
       {children}

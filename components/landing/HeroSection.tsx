@@ -43,13 +43,13 @@ export default function HeroSection({
 
   return (
     <section className="relative overflow-hidden bg-[#F8F8F4] dark:bg-[#081009] transition-colors duration-300">
-      <div className="absolute left-[-200px] top-[-100px] h-[700px] w-[700px] rounded-full bg-green-100/70 dark:bg-green-950/20 blur-[120px]" />
-      <div className="absolute bottom-0 right-[-150px] h-[500px] w-[500px] rounded-full bg-yellow-100/70 dark:bg-yellow-950/20 blur-[120px]" />
+      <div className="absolute left-[-200px] top-[-100px] h-[700px] w-[700px] rounded-full bg-green-100/70 dark:bg-emerald-950/20 blur-[120px]" />
+      <div className="absolute bottom-0 right-[-150px] h-[500px] w-[500px] rounded-full bg-yellow-100/70 dark:bg-amber-950/20 blur-[120px]" />
 
       <div className="relative mx-auto max-w-[1280px] px-6 py-16 lg:py-20">
         <div className="grid items-center gap-16 lg:grid-cols-2">
           <div>
-            <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-[#DCE8D8] bg-white px-4 py-2 text-sm font-medium text-[#00963F] dark:border-[#1d2f21] dark:bg-[#121c15] dark:text-[#00c853]">
+            <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-[#DCE8D8] dark:border-emerald-900/40 bg-white dark:bg-[#121c15] px-4 py-2 text-sm font-medium text-[#00963F] dark:text-emerald-400">
               <span>🌿</span>
               {isEnglish
                 ? "Bangladesh's first complete farm ERP"
@@ -90,7 +90,7 @@ export default function HeroSection({
                 {isEnglish ? "Start Farm Setup →" : "ফার্ম সেটআপ শুরু করুন →"}
               </Button>
               <Button
-                className="flex h-[56px] items-center rounded-full border border-[#D7D7D7] bg-white px-8 font-semibold text-[#08210F] dark:border-[#1d2f21] dark:bg-[#121c15] dark:text-white transition hover:bg-gray-50 dark:hover:bg-[#1d2f21] cursor-pointer"
+                className="flex h-[56px] items-center rounded-full border border-[#D7D7D7] dark:border-emerald-900/40 bg-white dark:bg-[#121c15] px-8 font-semibold text-[#08210F] dark:text-[#e2ede4] transition hover:bg-gray-50 dark:hover:bg-emerald-950/40 cursor-pointer"
                 onClick={onSecondaryClick}
               >
                 {isEnglish ? "View Dashboard" : "ড্যাশবোর্ড দেখুন"}
@@ -110,7 +110,7 @@ export default function HeroSection({
           </div>
 
           <div className="relative mx-auto w-full max-w-[620px]">
-            <div className="overflow-hidden rounded-[30px] border border-[#DED8C8] dark:border-[#1d2f21] bg-white dark:bg-[#121c15] shadow-[0_25px_60px_rgba(0,0,0,0.08)]">
+            <div className="overflow-hidden rounded-[30px] border border-[#DED8C8] dark:border-emerald-900/40 bg-white dark:bg-[#121c15] shadow-[0_25px_60px_rgba(0,0,0,0.08)]">
               <Image
                 src="/hero-plantation.jpg"
                 alt="Farm"
@@ -128,7 +128,7 @@ export default function HeroSection({
                     <div className="text-3xl font-bold text-[#08210F]">
                       {kpi.value}
                     </div>
-                    <div className="mt-1 text-xs text-gray-700">
+                    <div className="mt-1 text-xs text-[#08210F]/70">
                       {kpi.label}
                     </div>
                   </div>
@@ -136,10 +136,10 @@ export default function HeroSection({
               </div>
             </div>
 
-            <div className="absolute bottom-5 left-5 right-5 rounded-[20px] bg-[#F4F2EA] dark:bg-[#18271a] p-5 shadow-lg border border-transparent dark:border-[#273d2b]">
+            <div className="absolute bottom-5 left-5 right-5 rounded-[20px] bg-[#F4F2EA] dark:bg-[#121c15] border dark:border-emerald-900/45 p-5 shadow-lg transition-colors duration-300">
               <div className="flex items-center justify-between gap-4">
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                  <p className="text-xs text-gray-500 dark:text-gray-450">
                     {isEnglish ? "Today's Tip" : "আজকের পরামর্শ"}
                   </p>
                   <p className="mt-1 font-medium text-[#08210F] dark:text-white">
@@ -148,7 +148,7 @@ export default function HeroSection({
                       : "৪৮ ঘণ্টার বৃষ্টি — সার প্রয়োগ স্থগিত রাখুন"}
                   </p>
                 </div>
-                <div className="rounded-full bg-[#E7D6A7] dark:bg-[#2c230e] px-4 py-2 text-xs font-medium text-[#6E4D00] dark:text-[#f3cd78]">
+                <div className="rounded-full bg-[#E7D6A7] px-4 py-2 text-xs font-medium text-[#6E4D00]">
                   {isEnglish ? "Alert" : "সতর্কতা"}
                 </div>
               </div>

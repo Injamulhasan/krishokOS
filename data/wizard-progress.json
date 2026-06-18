@@ -262,5 +262,26 @@
     "lastSavedAt": 1781630799723,
     "completedAt": null,
     "expiresAt": 1781717199723
+  },
+  {
+    "id": "84db6587cfaee18c75e70d02312a718c",
+    "farmerId": "",
+    "userId": "a516c4e2-e869-428a-956c-7f24395cfe0c",
+    "currentStep": 1,
+    "completedSteps": [],
+    "stepData": {
+      "2": {
+        "farmName": "",
+        "farmType": "fruit"
+      },
+      "8": {
+        "primaryCrop": "banana",
+        "farmingMethod": "residue_free"
+      }
+    },
+    "resumeToken": "cb99bfbebd788ea82ef406e7c90d8a68eadfed9d11320576307e661567fea420",
+    "lastSavedAt": 1781797946421,
+    "completedAt": null,
+    "expiresAt": 1781884346421
   }
 ]

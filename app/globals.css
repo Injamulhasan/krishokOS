@@ -129,34 +129,21 @@
   }
 }
 
-
-
-body {
-  background: #f7f4ee;
-  overflow-x: hidden;
+:root {
+  --font-bengali: "Hind Siliguri", sans-serif;
+  --font-heading: "Plus Jakarta Sans", sans-serif;
 }
 
 html {
   scroll-behavior: smooth;
 }
 
-* {
-  box-sizing: border-box;
-}
-
-
-
-
-:root {
-  --font-bengali: "Hind Siliguri", sans-serif;
-  --font-heading: "Plus Jakarta Sans", sans-serif;
-}
-
 body {
   font-family: var(--font-bengali);
   background: #f8f8f4;
   color: #08210f;
-  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+  overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .dark body {
@@ -164,18 +151,11 @@ body {
   color: #e2ede4;
 }
 
-
-
-.hero-title {
-  font-family: var(--font-heading),
-    var(--font-bengali);
-}
-
+.hero-title,
 .section-title {
-  font-family: var(--font-heading),
-    var(--font-bengali);
+  font-family: var(--font-heading), var(--font-bengali);
 }
 
 .nav-font {
   font-family: var(--font-bengali);
-}
+}
