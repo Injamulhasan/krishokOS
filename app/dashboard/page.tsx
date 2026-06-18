@@ -2,6 +2,8 @@ import { requireUser } from "@/lib/auth";
 import { getFarmerByUserId, getFarmByFarmerId } from "@/lib/wizardDb";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import HeaderActions from "@/components/dashboard/HeaderActions";
+import AlertsWidget from "@/components/dashboard/AlertsWidget";
 
 // ─── Icon components (inline SVG to avoid adding lucide-react dep) ───────────
 const SproutIcon = () => (
@@ -388,9 +390,9 @@ export default async function DashboardPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 dark:from-[#081009] dark:via-[#0c1a0e] dark:to-[#081009] text-gray-800 dark:text-[#e2ede4] transition-colors duration-300">
       {/* ── Header ── */}
-      <header className="sticky top-0 z-50 border-b border-gray-200 bg-white shadow-sm">
+      <header className="sticky top-0 z-50 border-b border-gray-200 dark:border-emerald-900/40 bg-white dark:bg-[#121c15] shadow-sm transition-colors duration-300">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
           {/* Logo */}
           <div className="flex items-center gap-3">
@@ -398,41 +400,15 @@ export default async function DashboardPage() {
               <SproutIcon />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-gray-900">KrishokOS</h1>
-              <p className="text-xs font-medium text-green-600">
+              <h1 className="text-xl font-bold text-gray-900 dark:text-white">KrishokOS</h1>
+              <p className="text-xs font-medium text-green-600 dark:text-emerald-400">
                 Agriculture Operating System
               </p>
             </div>
           </div>
 
           {/* Nav actions */}
-          <div className="flex items-center gap-2">
-            <Link
-              href="/alerts"
-              className="relative rounded-lg p-2 transition hover:bg-gray-100"
-            >
-              <BellIcon />
-              <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-red-500" />
-            </Link>
-            <Link
-              href="/profile"
-              className="flex items-center gap-2 rounded-lg px-3 py-2 transition hover:bg-gray-100"
-            >
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-600 text-white">
-                <UserIcon />
-              </div>
-              <span className="hidden text-sm text-gray-700 sm:block">
-                {userName}
-              </span>
-            </Link>
-            <Link
-              href="/auth/signin"
-              className="flex items-center gap-2 rounded-lg px-3 py-2 text-red-600 transition hover:bg-red-50"
-            >
-              <LogOutIcon />
-              <span className="hidden text-sm sm:block">Logout</span>
-            </Link>
-          </div>
+          <HeaderActions userName={userName} />
         </div>
       </header>
 
@@ -441,10 +417,10 @@ export default async function DashboardPage() {
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Left: welcome + quick stats */}
           <div className="lg:col-span-2">
-            <h2 className="text-2xl font-bold text-gray-900">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
               Welcome back, {userName}!
             </h2>
-            <p className="mb-6 text-gray-500">
+            <p className="mb-6 text-gray-500 dark:text-gray-400">
               {userDistrict} &bull; {today}
             </p>
 
@@ -452,17 +428,17 @@ export default async function DashboardPage() {
               {quickStats.map((stat) => (
                 <div
                   key={stat.label}
-                  className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm"
+                  className="rounded-xl border border-gray-100 dark:border-emerald-900/40 bg-white dark:bg-[#121c15] p-4 shadow-sm transition-colors duration-300"
                 >
                   <div
-                    className={`mb-3 flex h-9 w-9 items-center justify-center rounded-lg ${stat.iconBg} ${stat.iconColor}`}
+                    className={`mb-3 flex h-9 w-9 items-center justify-center rounded-lg ${stat.iconBg} ${stat.iconColor} [&.bg-green-50]:dark:bg-emerald-950/40 [&.text-green-600]:dark:text-emerald-400 [&.bg-blue-50]:dark:bg-blue-950/40 [&.text-blue-600]:dark:text-blue-400 [&.bg-emerald-50]:dark:bg-emerald-950/40 [&.text-emerald-600]:dark:text-emerald-400 [&.bg-amber-50]:dark:bg-amber-950/40 [&.text-amber-600]:dark:text-amber-400`}
                   >
                     {stat.icon}
                   </div>
-                  <p className="text-2xl font-bold text-gray-900">
+                  <p className="text-2xl font-bold text-gray-900 dark:text-[#e2ede4]">
                     {stat.value}
                   </p>
-                  <p className="mt-1 text-xs text-gray-500">{stat.label}</p>
+                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{stat.label}</p>
                 </div>
               ))}
             </div>
@@ -494,20 +470,20 @@ export default async function DashboardPage() {
         </div>
         {/* ── Personalized Farm Setup Alert / Analytics ── */}
         {!farm ? (
-          <div className="rounded-2xl border border-amber-200 bg-amber-50/50 p-6 shadow-sm">
+          <div className="rounded-2xl border border-amber-200 dark:border-amber-900/30 bg-amber-50/50 dark:bg-amber-950/20 p-6 shadow-sm transition-colors duration-300">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-start gap-3">
                 <span className="mt-0.5 text-xl">⚠️</span>
                 <div>
-                  <h4 className="font-bold text-amber-900">Farm Setup Not Complete</h4>
-                  <p className="text-sm text-amber-700 mt-1">
+                  <h4 className="font-bold text-amber-900 dark:text-amber-300">Farm Setup Not Complete</h4>
+                  <p className="text-sm text-amber-700 dark:text-amber-400 mt-1">
                     Please complete your 11-step farm profile setup to activate AI disease detection, compliance score trackers, soil analysis diagnostics, and daily advisory calendars.
                   </p>
                 </div>
               </div>
               <Link
                 href="/plant-management"
-                className="inline-flex shrink-0 items-center justify-center rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-semibold px-5 py-2.5 text-sm transition shadow-sm"
+                className="inline-flex shrink-0 items-center justify-center rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold px-5 py-2.5 text-sm transition shadow-sm cursor-pointer"
               >
                 Set Up Your Farm →
               </Link>
@@ -515,43 +491,43 @@ export default async function DashboardPage() {
           </div>
         ) : (
           <section className="space-y-6">
-            <div className="flex items-center gap-2 border-b border-gray-200 pb-3">
-              <span className="text-green-600">
+            <div className="flex items-center gap-2 border-b border-gray-200 dark:border-emerald-900/40 pb-3">
+              <span className="text-green-600 dark:text-emerald-400">
                 <SproutIcon />
               </span>
-              <h3 className="text-xl font-extrabold text-gray-900">
+              <h3 className="text-xl font-extrabold text-gray-900 dark:text-white">
                 Personalized Farm Insights &amp; Analytics
               </h3>
             </div>
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {/* Soil & Irrigation Diagnostics Card */}
-              <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition hover:shadow-md">
+              <div className="rounded-2xl border border-gray-100 dark:border-emerald-900/40 bg-white dark:bg-[#121c15] p-6 shadow-sm transition-all duration-300 hover:shadow-md">
                 <div className="mb-4 flex items-center justify-between">
-                  <h4 className="text-sm font-bold uppercase tracking-wider text-[#4B5A44]">
+                  <h4 className="text-sm font-bold uppercase tracking-wider text-[#4B5A44] dark:text-emerald-400">
                     Soil &amp; Irrigation
                   </h4>
-                  <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700">
+                  <span className="rounded-full bg-blue-50 dark:bg-blue-950/40 px-2.5 py-1 text-xs font-bold text-blue-700 dark:text-blue-400">
                     Active Profile
                   </span>
                 </div>
                 
                 <div className="space-y-4">
                   <div>
-                    <span className="text-xs text-gray-400 block font-medium">Soil Type</span>
-                    <span className="font-bold text-gray-900 block capitalize">{farm.soilType} Soil</span>
+                    <span className="text-xs text-gray-400 dark:text-gray-500 block font-medium">Soil Type</span>
+                    <span className="font-bold text-gray-900 dark:text-[#e2ede4] block capitalize">{farm.soilType} Soil</span>
                   </div>
                   <div>
-                    <span className="text-xs text-gray-400 block font-medium">Water Source</span>
-                    <span className="font-bold text-gray-900 block capitalize">{farm.waterSource.replace(/_/g, " ")}</span>
+                    <span className="text-xs text-gray-400 dark:text-gray-500 block font-medium">Water Source</span>
+                    <span className="font-bold text-gray-900 dark:text-[#e2ede4] block capitalize">{farm.waterSource.replace(/_/g, " ")}</span>
                   </div>
-                  <div className="mt-2 text-sm text-gray-600 border-t border-gray-100 pt-3 leading-relaxed">
+                  <div className="mt-2 text-sm text-gray-600 dark:text-gray-400 border-t border-gray-100 dark:border-emerald-900/10 pt-3 leading-relaxed">
                     {farm.soilType.toLowerCase() === "loamy" && "Loamy soil is ideal for banana/papaya crops, providing excellent nutrient absorption and drainage."}
                     {farm.soilType.toLowerCase() === "clay" && "Clay soil is highly compact. Build raised beds to avoid root rot and monitor irrigation closely."}
                     {farm.soilType.toLowerCase() === "sandy" && "Sandy soil drains nutrients quickly. Supplement with organic compost and irrigate in short, frequent intervals."}
                     {farm.soilType.toLowerCase() === "silty" && "Silty soil holds moisture well but can crust. Aerate soil around crop root zones regularly."}
                   </div>
-                  <div className="text-xs text-[#00963F] font-semibold bg-green-50 p-2.5 rounded-lg">
+                  <div className="text-xs text-[#00963F] dark:text-emerald-400 font-semibold bg-green-50 dark:bg-emerald-950/20 p-2.5 rounded-lg border dark:border-emerald-900/10">
                     {farm.waterSource.toLowerCase() === "groundwater" && "✓ Groundwater is optimal. Annual pH test recommended to target 6.5."}
                     {farm.waterSource.toLowerCase() === "surface_water" && "✓ Filter surface water before application to eliminate fungal spores."}
                     {farm.waterSource.toLowerCase() === "rainwater" && "✓ Perfect quality. Clean collection tanks to prevent bacterial buildup."}
@@ -561,18 +537,18 @@ export default async function DashboardPage() {
               </div>
 
               {/* Cultivation Method Strategy Card */}
-              <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition hover:shadow-md">
+              <div className="rounded-2xl border border-gray-100 dark:border-emerald-900/40 bg-white dark:bg-[#121c15] p-6 shadow-sm transition-all duration-300 hover:shadow-md">
                 <div className="mb-4 flex items-center justify-between">
-                  <h4 className="text-sm font-bold uppercase tracking-wider text-[#4B5A44]">
+                  <h4 className="text-sm font-bold uppercase tracking-wider text-[#4B5A44] dark:text-emerald-400">
                     Farming Strategy
                   </h4>
-                  <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
+                  <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${
                     farm.farmingMethod === "residue_free"
                       ? "bg-emerald-100 text-emerald-800"
                       : farm.farmingMethod === "organic"
                       ? "bg-purple-100 text-purple-800"
                       : "bg-gray-100 text-gray-800"
-                  }`}>
+                  } [&.bg-emerald-100]:dark:bg-emerald-950/40 [&.text-emerald-800]:dark:text-emerald-400 [&.bg-purple-100]:dark:bg-purple-950/40 [&.text-purple-800]:dark:text-purple-400 [&.bg-gray-100]:dark:bg-[#081009] [&.text-gray-800]:dark:text-gray-400`}>
                     {farm.farmingMethod === "residue_free" && "Residue-Free"}
                     {farm.farmingMethod === "organic" && "Organic"}
                     {farm.farmingMethod === "chemical" && "Chemical"}
@@ -581,22 +557,22 @@ export default async function DashboardPage() {
                 
                 <div className="space-y-4">
                   <div>
-                    <span className="text-xs text-gray-400 block font-medium">Target Market</span>
-                    <span className="font-bold text-gray-900 block">
+                    <span className="text-xs text-gray-400 dark:text-gray-500 block font-medium">Target Market</span>
+                    <span className="font-bold text-gray-900 dark:text-[#e2ede4] block">
                       {farm.farmingMethod === "residue_free" && "International Export Market"}
                       {farm.farmingMethod === "organic" && "Premium Organic Retailers"}
                       {farm.farmingMethod === "chemical" && "Traditional Local Markets"}
                     </span>
                   </div>
                   <div>
-                    <span className="text-xs text-gray-400 block font-medium">Core Compliance</span>
-                    <span className="font-bold text-gray-900 block">
+                    <span className="text-xs text-gray-400 dark:text-gray-500 block font-medium">Core Compliance</span>
+                    <span className="font-bold text-gray-900 dark:text-[#e2ede4] block">
                       {farm.farmingMethod === "residue_free" && "GlobalGAP Certification Readiness"}
                       {farm.farmingMethod === "organic" && "IFOAM Standard (Zero Synthetic Inputs)"}
                       {farm.farmingMethod === "chemical" && "NPK Optimization Program"}
                     </span>
                   </div>
-                  <div className="mt-2 text-sm text-gray-600 border-t border-gray-100 pt-3 leading-relaxed">
+                  <div className="mt-2 text-sm text-gray-600 dark:text-gray-400 border-t border-gray-100 dark:border-emerald-900/10 pt-3 leading-relaxed">
                     {farm.farmingMethod === "residue_free" && "Priority: Zero pesticide trace. Rely on biological controls like Trichoderma viride and yellow sticky traps."}
                     {farm.farmingMethod === "organic" && "Priority: Soil life enhancement. Rely on compost, vermicompost, and organic liquid manure sprays."}
                     {farm.farmingMethod === "chemical" && "Priority: Cost containment. Optimize fertilizer application to prevent nutrient runoff and soil acidification."}
@@ -605,32 +581,32 @@ export default async function DashboardPage() {
               </div>
 
               {/* Financial ROI and Cost Target Card */}
-              <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition hover:shadow-md">
+              <div className="rounded-2xl border border-gray-100 dark:border-emerald-900/40 bg-white dark:bg-[#121c15] p-6 shadow-sm transition-all duration-300 hover:shadow-md">
                 <div className="mb-4 flex items-center justify-between">
-                  <h4 className="text-sm font-bold uppercase tracking-wider text-[#4B5A44]">
+                  <h4 className="text-sm font-bold uppercase tracking-wider text-[#4B5A44] dark:text-emerald-400">
                     Financial Forecast
                   </h4>
-                  <span className="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">
+                  <span className="rounded-full bg-amber-50 dark:bg-amber-950/30 px-2.5 py-1 text-xs font-bold text-amber-700 dark:text-amber-400">
                     75/25 Model
                   </span>
                 </div>
                 
                 <div className="space-y-3">
                   <div>
-                    <span className="text-xs text-gray-400 block font-medium">Annual Budget Allocation</span>
-                    <div className="mt-1 flex items-center justify-between text-xs text-gray-600">
+                    <span className="text-xs text-gray-400 dark:text-gray-500 block font-medium">Annual Budget Allocation</span>
+                    <div className="mt-1 flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
                       <span>Inputs (75%): {Math.round(farm.annualBudget * 0.75).toLocaleString()} {farm.budgetCurrency}</span>
                       <span>Reserve (25%): {Math.round(farm.annualBudget * 0.25).toLocaleString()} {farm.budgetCurrency}</span>
                     </div>
-                    <div className="mt-1 h-2 w-full rounded-full bg-gray-100 overflow-hidden flex">
+                    <div className="mt-1 h-2 w-full rounded-full bg-gray-100 dark:bg-[#081009] overflow-hidden flex">
                       <div className="h-full bg-green-600" style={{ width: "75%" }} />
                       <div className="h-full bg-amber-500" style={{ width: "25%" }} />
                     </div>
                   </div>
                   
-                  <div className="border-t border-gray-100 pt-3">
-                    <span className="text-xs text-gray-400 block font-medium">Projected Yield (Est.)</span>
-                    <span className="font-bold text-gray-900 block text-lg">
+                  <div className="border-t border-gray-100 dark:border-emerald-900/10 pt-3">
+                    <span className="text-xs text-gray-400 dark:text-gray-500 block font-medium">Projected Yield (Est.)</span>
+                    <span className="font-bold text-gray-900 dark:text-[#e2ede4] block text-lg">
                       {/* Yield calculation: Banana ≈ 14 tons/acre, Papaya ≈ 22 tons/acre */}
                       {(() => {
                         let acres = 0;
@@ -647,8 +623,8 @@ export default async function DashboardPage() {
                   </div>
 
                   <div>
-                    <span className="text-xs text-gray-400 block font-medium">Projected Revenue (Est.)</span>
-                    <span className="font-bold text-[#00963F] block text-xl">
+                    <span className="text-xs text-gray-400 dark:text-gray-500 block font-medium">Projected Revenue (Est.)</span>
+                    <span className="font-bold text-[#00963F] dark:text-emerald-400 block text-xl">
                       {(() => {
                         let acres = 0;
                         if (farm.areaUnit === "decimal") acres = farm.areaSize / 100;
@@ -670,14 +646,19 @@ export default async function DashboardPage() {
           </section>
         )}
 
+        {/* ── Disease & Pest Alert Network Widget ── */}
+        <section className="mt-8">
+          <AlertsWidget />
+        </section>
+
         {/* ── ERP Modules ── */}
         <section>
-          <h3 className="mb-4 text-lg font-bold text-gray-900">ERP Modules</h3>
+          <h3 className="mb-4 text-lg font-bold text-gray-900 dark:text-white">ERP Modules</h3>
           <div className="grid gap-5 md:grid-cols-3">
             {mainModules.map((mod) => (
               <div
                 key={mod.id}
-                className={`overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all ${
+                className={`overflow-hidden rounded-2xl border border-gray-100 dark:border-emerald-900/40 bg-white dark:bg-[#121c15] shadow-sm transition-all ${
                   mod.active
                     ? "cursor-pointer hover:-translate-y-0.5 hover:shadow-lg"
                     : "opacity-70"
@@ -689,22 +670,22 @@ export default async function DashboardPage() {
                   </div>
                   <div className="p-5">
                     <div className="mb-2 flex items-start justify-between">
-                      <h4 className="font-bold text-gray-900">{mod.title}</h4>
+                      <h4 className="font-bold text-gray-900 dark:text-[#e2ede4]">{mod.title}</h4>
                       <span
-                        className={`rounded-full px-2 py-0.5 text-xs font-medium ${mod.badgeClass}`}
+                        className={`rounded-full px-2 py-0.5 text-xs font-semibold ${mod.badgeClass} [&.bg-green-100]:dark:bg-emerald-950/40 [&.text-green-700]:dark:text-emerald-400 [&.bg-orange-100]:dark:bg-orange-950/40 [&.text-orange-700]:dark:text-orange-400 [&.bg-blue-100]:dark:bg-blue-950/40 [&.text-blue-700]:dark:text-blue-400`}
                       >
                         {mod.badge}
                       </span>
                     </div>
-                    <p className="mb-4 text-sm text-gray-500">
+                    <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">
                       {mod.description}
                     </p>
                     {mod.active ? (
-                      <span className="flex items-center gap-1 text-sm font-medium text-green-600">
+                      <span className="flex items-center gap-1 text-sm font-medium text-green-600 dark:text-emerald-400">
                         Open Module <ArrowRightIcon />
                       </span>
                     ) : (
-                      <span className="text-xs text-gray-400">
+                      <span className="text-xs text-gray-400 dark:text-gray-500">
                         Coming in Phase 3
                       </span>
                     )}
@@ -718,10 +699,10 @@ export default async function DashboardPage() {
         {/* ── AI & Smart Tools ── */}
         <section>
           <div className="mb-4 flex items-center gap-2">
-            <span className="text-purple-600">
+            <span className="text-purple-600 dark:text-purple-400">
               <BotIcon />
             </span>
-            <h3 className="text-lg font-bold text-gray-900">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">
               AI &amp; Smart Tools
             </h3>
           </div>
@@ -730,7 +711,7 @@ export default async function DashboardPage() {
               <Link
                 key={tool.id}
                 href={tool.path}
-                className="group overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+                className="group overflow-hidden rounded-2xl border border-gray-100 dark:border-emerald-900/40 bg-white dark:bg-[#121c15] shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
               >
                 <div
                   className="p-5 text-white"
@@ -742,14 +723,14 @@ export default async function DashboardPage() {
                 </div>
                 <div className="p-4">
                   <span
-                    className={`rounded-full px-2 py-0.5 text-xs font-medium ${tool.tagClass}`}
+                    className={`rounded-full px-2 py-0.5 text-xs font-semibold ${tool.tagClass} [&.bg-purple-50]:dark:bg-purple-950/40 [&.text-purple-600]:dark:text-purple-400 [&.bg-rose-50]:dark:bg-rose-950/40 [&.text-rose-600]:dark:text-rose-400 [&.bg-sky-50]:dark:bg-sky-950/40 [&.text-sky-600]:dark:text-sky-400 [&.bg-amber-50]:dark:bg-amber-950/40 [&.text-amber-600]:dark:text-amber-400`}
                   >
                     {tool.tag}
                   </span>
-                  <h4 className="mb-1 mt-2 font-bold text-gray-900">
+                  <h4 className="mb-1 mt-2 font-bold text-gray-900 dark:text-[#e2ede4]">
                     {tool.title}
                   </h4>
-                  <p className="text-xs text-gray-500">{tool.description}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{tool.description}</p>
                 </div>
               </Link>
             ))}
@@ -758,7 +739,7 @@ export default async function DashboardPage() {
 
         {/* ── Platform Features ── */}
         <section>
-          <h3 className="mb-4 text-lg font-bold text-gray-900">
+          <h3 className="mb-4 text-lg font-bold text-gray-900 dark:text-white">
             Platform Features
           </h3>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -766,18 +747,18 @@ export default async function DashboardPage() {
               <Link
                 key={feat.id}
                 href={feat.path}
-                className="flex cursor-pointer items-start gap-4 rounded-xl border border-gray-100 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+                className="flex cursor-pointer items-start gap-4 rounded-xl border border-gray-100 dark:border-emerald-900/40 bg-white dark:bg-[#121c15] p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
               >
                 <div
-                  className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${feat.iconBg} ${feat.iconColor}`}
+                  className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${feat.iconBg} ${feat.iconColor} [&.bg-indigo-50]:dark:bg-indigo-950/40 [&.text-indigo-600]:dark:text-indigo-400 [&.bg-emerald-50]:dark:bg-emerald-950/40 [&.text-emerald-600]:dark:text-emerald-400 [&.bg-teal-50]:dark:bg-teal-950/40 [&.text-teal-600]:dark:text-teal-400 [&.bg-green-50]:dark:bg-emerald-950/40 [&.text-green-600]:dark:text-emerald-400 [&.bg-blue-50]:dark:bg-blue-950/40 [&.text-blue-600]:dark:text-blue-400 [&.bg-purple-50]:dark:bg-purple-950/40 [&.text-purple-600]:dark:text-purple-400`}
                 >
                   {feat.icon}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <h4 className="font-semibold text-gray-900">{feat.title}</h4>
-                  <p className="text-sm text-gray-500">{feat.description}</p>
+                  <h4 className="font-semibold text-gray-900 dark:text-[#e2ede4]">{feat.title}</h4>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{feat.description}</p>
                 </div>
-                <span className="mt-1 shrink-0 text-gray-300">
+                <span className="mt-1 shrink-0 text-gray-300 dark:text-gray-600">
                   <ArrowRightIcon />
                 </span>
               </Link>
@@ -786,7 +767,7 @@ export default async function DashboardPage() {
         </section>
 
         {/* ── Footer ── */}
-        <div className="border-t border-gray-100 py-4 text-center text-sm text-gray-400">
+        <div className="border-t border-gray-100 dark:border-emerald-900/10 py-4 text-center text-sm text-gray-400 dark:text-gray-500">
           KrishokOS v2.0 — Agriculture Operating System for Residue-Free Export
           Production
         </div>
