@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Hind_Siliguri, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { AuthProvider } from "@/components/providers/AuthProvider";
 
 const hind = Hind_Siliguri({
   subsets: ["bengali"],
@@ -49,9 +50,11 @@ export default function RootLayout({
       <body
         className={`${hind.variable} ${jakarta.variable}`}
       >
-        <ThemeProvider>
-          {children}
-        </ThemeProvider>
+        <AuthProvider>
+          <ThemeProvider>
+            {children}
+          </ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   );

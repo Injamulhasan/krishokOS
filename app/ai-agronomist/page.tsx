@@ -9,5 +9,5 @@ export default async function AIAgronomistPage() {
     redirect("/auth/signin");
   }
 
-  return <AIAgronomistClient userName={user.name} />;
+  return <AIAgronomistClient userName={user.name || "Farmer"} />;
 }

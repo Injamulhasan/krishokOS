@@ -1,16 +1,9 @@
-import {
-  getSessionTokenFromCookies,
-  getUserFromSessionToken,
-} from "@/lib/auth";
+import { requireUser } from "@/lib/auth";
 import { NextResponse } from "next/server";
 
 export async function GET() {
-  const token = await getSessionTokenFromCookies();
-  if (!token) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const user = await getUserFromSessionToken(token);
+  const user = await requireUser();
+  
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -21,7 +14,6 @@ export async function GET() {
       id: user.id,
       name: user.name,
       email: user.email,
-      isVerified: user.isVerified,
     },
   });
 }

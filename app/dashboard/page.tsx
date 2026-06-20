@@ -1,11 +1,9 @@
 import { requireUser } from "@/lib/auth";
-import { getFarmerByUserId, getFarmByFarmerId } from "@/lib/wizardDb";
+import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import HeaderActions from "@/components/dashboard/HeaderActions";
 import AlertsWidget from "@/components/dashboard/AlertsWidget";
-import { readFile } from "fs/promises";
-import path from "path";
 
 // ─── Icon components (inline SVG to avoid adding lucide-react dep) ───────────
 const SproutIcon = () => (
@@ -74,36 +72,13 @@ export default async function DashboardPage() {
   const user = await requireUser();
   if (!user) redirect("/auth/signin");
 
-  // Load user's actual farm details if they completed the setup wizard
-  const farmer = await getFarmerByUserId(user.id);
-  
-  // Load all farms for this user's farmer records dynamically
-  let farmerFarms: any[] = [];
-  if (farmer) {
-    try {
-      const DATA_DIR = process.env.VERCEL === "1" || process.cwd().includes("/var/task") ? "/tmp" : path.join(process.cwd(), "data");
-      const farmersPath = path.join(DATA_DIR, "farmers.json");
-      const farmsPath = path.join(DATA_DIR, "farms.json");
-      
-      const farmersData = await readFile(farmersPath, "utf-8");
-      const farmsData = await readFile(farmsPath, "utf-8");
-      
-      const allFarmers = JSON.parse(farmersData);
-      const allFarms = JSON.parse(farmsData);
-      
-      const userFarmers = allFarmers.filter((f: any) => f.userId === user.id);
-      const farmerIds = userFarmers.map((f: any) => f.id);
-      
-      farmerFarms = allFarms.filter((f: any) => farmerIds.includes(f.farmerId));
-    } catch (e) {
-      console.error("Error loading user farms:", e);
-      const singleFarm = await getFarmByFarmerId(farmer.id);
-      if (singleFarm) {
-        farmerFarms = [singleFarm];
-      }
-    }
-  }
+  // Load farmer and associated farms in a single query via Prisma
+  const farmer = await prisma.farmer.findUnique({
+    where: { userId: user.id },
+    include: { farms: true },
+  });
 
+  const farmerFarms = farmer ? farmer.farms : [];
   const farm = farmerFarms.length > 0 ? farmerFarms[0] : null;
 
   const userName = user.name || "Farmer";

@@ -1,16 +1,25 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { FormEvent, useState, useEffect, Suspense } from "react";
+import { signIn } from "next-auth/react";
 
-export default function SigninPage() {
+function SigninForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const emailParam = searchParams.get("email");
+    if (emailParam) {
+      setIdentifier(emailParam);
+    }
+  }, [searchParams]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -19,23 +28,14 @@ export default function SigninPage() {
     setLoading(true);
 
     try {
-      const response = await fetch("/api/auth/signin", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ identifier, password }),
-        credentials: "include",
+      const result = await signIn("credentials", {
+        redirect: false,
+        email: identifier.toLowerCase(),
+        password,
       });
-      const result = await response.json();
 
-      if (!response.ok) {
-        if (result.needsVerification) {
-          router.push(
-            `/auth/verify-email?email=${encodeURIComponent(identifier)}`,
-          );
-          return;
-        }
-
-        setError(result.error || "Invalid credentials.");
+      if (result?.error) {
+        setError("Invalid email or password.");
         return;
       }
 
@@ -123,5 +123,17 @@ export default function SigninPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SigninPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#F8F8F4] dark:bg-[#081009] flex items-center justify-center transition-colors duration-300">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 dark:border-emerald-500"></div>
+      </div>
+    }>
+      <SigninForm />
+    </Suspense>
   );
 }

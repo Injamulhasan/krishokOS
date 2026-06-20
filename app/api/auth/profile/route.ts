@@ -1,19 +1,11 @@
-import {
-  getSessionTokenFromCookies,
-  getUserFromSessionToken,
-  updateUserProfile,
-} from "@/lib/auth";
+import { requireUser } from "@/lib/auth";
 import { updateFarmerProfile } from "@/lib/wizardDb";
 import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
 
 export async function PUT(req: NextRequest) {
   try {
-    const token = await getSessionTokenFromCookies();
-    if (!token) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const user = await getUserFromSessionToken(token);
+    const user = await requireUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -28,8 +20,27 @@ export async function PUT(req: NextRequest) {
       );
     }
 
+    // Check if email is already taken by another user
+    const emailTaken = await prisma.user.findFirst({
+      where: {
+        email: email.toLowerCase(),
+        id: { not: user.id }
+      }
+    });
+
+    if (emailTaken) {
+      return NextResponse.json({ error: "Email already in use" }, { status: 409 });
+    }
+
     // Update user profile in auth database
-    const updatedUser = await updateUserProfile(user.id, { name, email, phone });
+    const updatedUser = await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        name,
+        email: email.toLowerCase(),
+        phone: phone || null,
+      }
+    });
 
     // Sync with farmer profile if it exists
     await updateFarmerProfile(user.id, {
@@ -44,7 +55,6 @@ export async function PUT(req: NextRequest) {
         name: updatedUser.name,
         email: updatedUser.email,
         phone: updatedUser.phone,
-        isVerified: updatedUser.isVerified,
       },
     });
   } catch (error: any) {
