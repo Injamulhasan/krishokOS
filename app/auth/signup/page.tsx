@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
+import { signIn } from "next-auth/react";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -25,7 +26,6 @@ export default function SignupPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, phone, password }),
-        credentials: "include",
       });
 
       const result = await response.json();
@@ -34,10 +34,21 @@ export default function SignupPage() {
         return;
       }
 
-      setMessage("Account created. Verify your email to continue.");
-      router.push(
-        `/auth/verify-email?email=${encodeURIComponent(email)}&code=${encodeURIComponent(result.verificationCode)}`,
-      );
+      setMessage("Account created successfully! Logging you in...");
+
+      // Automatically sign in the user
+      const signInResult = await signIn("credentials", {
+        redirect: false,
+        email: email.toLowerCase(),
+        password,
+      });
+
+      if (signInResult?.error) {
+        // Fallback to signin page with pre-filled email if auto-signin fails
+        router.push(`/auth/signin?email=${encodeURIComponent(email)}`);
+      } else {
+        router.push("/dashboard");
+      }
     } catch (err) {
       setError("Something went wrong. Please try again.");
     } finally {

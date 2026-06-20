@@ -1,18 +1,12 @@
 /**
- * Database helper functions for Wizard
- * Manages FARMER, FARM, and WIZARDPROGRESS records
+ * Database helper functions for Wizard (Prisma/Supabase PostgreSQL Edition)
+ * Manages FARMER, FARM, and WIZARDPROGRESS records via Prisma Client.
  */
 
 import { randomBytes } from "crypto";
-import { readFile, writeFile, mkdir } from "fs/promises";
-import path from "path";
+import prisma from "@/lib/prisma";
 
-const isServerless =
-  process.env.VERCEL === "1" ||
-  process.cwd().includes("/var/task");
-const DATA_DIR = isServerless ? "/tmp" : path.join(process.cwd(), "data");
-
-interface Farmer {
+export interface Farmer {
   id: string;
   userId: string;
   fullName: string;
@@ -23,7 +17,7 @@ interface Farmer {
   updatedAt: number;
 }
 
-interface Farm {
+export interface Farm {
   id: string;
   farmerId: string;
   farmName: string;
@@ -44,7 +38,7 @@ interface Farm {
   updatedAt: number;
 }
 
-interface WizardProgress {
+export interface WizardProgress {
   id: string;
   farmerId: string;
   userId: string;
@@ -57,104 +51,75 @@ interface WizardProgress {
   expiresAt: number;
 }
 
-// Utility function to generate ID (hex string)
-function generateId(): string {
-  return randomBytes(16).toString("hex");
-}
-
-// Utility function to ensure file exists
-async function ensureFileExists(
-  filePath: string,
-  initialData: any,
-): Promise<void> {
-  try {
-    await readFile(filePath);
-  } catch {
-    await mkdir(path.dirname(filePath), { recursive: true });
-    // If it fails, check if we are in serverless mode (i.e. filePath is in /tmp)
-    // and if there's a template file in the original data directory.
-    if (filePath.startsWith("/tmp")) {
-      const filename = path.basename(filePath);
-      const originalPath = path.join(process.cwd(), "data", filename);
-      try {
-        const contents = await readFile(originalPath, "utf8");
-        await writeFile(filePath, contents, "utf8");
-        return;
-      } catch (err) {
-        // Fallback to initialData
-      }
-    }
-    await writeFile(filePath, JSON.stringify(initialData, null, 2));
-  }
-}
-
 /**
- * Initialize wizard for a user
+ * Initialize wizard progress for a user in the database
  */
 export async function initializeWizard(
   userId: string,
   initialData?: { crop?: string; farmingMethod?: string },
 ): Promise<WizardProgress> {
-  const wizardProgressPath = path.join(DATA_DIR, "wizard-progress.json");
-  await ensureFileExists(wizardProgressPath, []);
-
-  const data = await readFile(wizardProgressPath, "utf-8");
-  const wizardProgress: WizardProgress[] = JSON.parse(data);
-
   // Check if user already has active wizard
-  const existingIndex = wizardProgress.findIndex(
-    (w) => w.userId === userId && !w.completedAt && w.expiresAt > Date.now(),
-  );
-
-  let wizard: WizardProgress;
-
-  if (existingIndex !== -1) {
-    // Reset existing wizard progress with the new initialData
-    wizard = wizardProgress[existingIndex];
-    wizard.currentStep = 1;
-    wizard.completedSteps = [];
-    wizard.stepData = {};
-    wizard.lastSavedAt = Date.now();
-    wizard.expiresAt = Date.now() + 24 * 60 * 60 * 1000;
-  } else {
-    // Create new wizard
-    wizard = {
-      id: generateId(),
-      farmerId: "",
+  let wizard = await prisma.wizardProgress.findFirst({
+    where: {
       userId,
-      currentStep: 1,
-      completedSteps: [],
-      stepData: {},
-      resumeToken: randomBytes(32).toString("hex"),
-      lastSavedAt: Date.now(),
       completedAt: null,
-      expiresAt: Date.now() + 24 * 60 * 60 * 1000,
-    };
-    wizardProgress.push(wizard);
-  }
+      expiresAt: { gt: new Date() },
+    },
+  });
 
-  // Pre-populate if initialData is provided
+  const stepData: Record<number, any> = {};
   if (initialData?.crop || initialData?.farmingMethod) {
-    wizard.stepData[8] = {
+    stepData[8] = {
       primaryCrop: initialData.crop || "",
       farmingMethod: initialData.farmingMethod || "",
     };
 
-    // Auto-pre-fill step 2 farmType since banana & papaya are fruit crops
     if (initialData.crop === "banana" || initialData.crop === "papaya") {
-      wizard.stepData[2] = {
+      stepData[2] = {
         farmName: "",
         farmType: "fruit",
       };
     }
   }
 
-  if (existingIndex !== -1) {
-    wizardProgress[existingIndex] = wizard;
+  if (wizard) {
+    // Reset existing wizard
+    wizard = await prisma.wizardProgress.update({
+      where: { id: wizard.id },
+      data: {
+        currentStep: 1,
+        completedSteps: [],
+        stepData: stepData as any,
+        lastSavedAt: new Date(),
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+      },
+    });
+  } else {
+    // Create new wizard
+    wizard = await prisma.wizardProgress.create({
+      data: {
+        userId,
+        currentStep: 1,
+        completedSteps: [],
+        stepData: stepData as any,
+        resumeToken: randomBytes(32).toString("hex"),
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+      },
+    });
   }
-  await writeFile(wizardProgressPath, JSON.stringify(wizardProgress, null, 2));
 
-  return wizard;
+  return {
+    id: wizard.id,
+    farmerId: wizard.farmerId || "",
+    userId: wizard.userId,
+    currentStep: wizard.currentStep,
+    completedSteps: wizard.completedSteps,
+    stepData: wizard.stepData as any,
+    resumeToken: wizard.resumeToken,
+    lastSavedAt: wizard.lastSavedAt.getTime(),
+    completedAt: wizard.completedAt ? wizard.completedAt.getTime() : null,
+    expiresAt: wizard.expiresAt.getTime(),
+  };
 }
 
 /**
@@ -163,144 +128,191 @@ export async function initializeWizard(
 export async function getWizardByUserId(
   userId: string,
 ): Promise<WizardProgress | null> {
-  const wizardProgressPath = path.join(DATA_DIR, "wizard-progress.json");
-  await ensureFileExists(wizardProgressPath, []);
+  const wizard = await prisma.wizardProgress.findFirst({
+    where: {
+      userId,
+      completedAt: null,
+      expiresAt: { gt: new Date() },
+    },
+  });
 
-  const data = await readFile(wizardProgressPath, "utf-8");
-  const wizardProgress: WizardProgress[] = JSON.parse(data);
+  if (!wizard) return null;
 
-  const wizard = wizardProgress.find(
-    (w) => w.userId === userId && !w.completedAt && w.expiresAt > Date.now(),
-  );
-
-  return wizard || null;
+  return {
+    id: wizard.id,
+    farmerId: wizard.farmerId || "",
+    userId: wizard.userId,
+    currentStep: wizard.currentStep,
+    completedSteps: wizard.completedSteps,
+    stepData: wizard.stepData as any,
+    resumeToken: wizard.resumeToken,
+    lastSavedAt: wizard.lastSavedAt.getTime(),
+    completedAt: wizard.completedAt ? wizard.completedAt.getTime() : null,
+    expiresAt: wizard.expiresAt.getTime(),
+  };
 }
 
 /**
- * Save step data
+ * Save wizard step data to the database
  */
 export async function saveWizardStep(
   wizardId: string,
   stepNumber: number,
   stepData: any,
 ): Promise<WizardProgress> {
-  const wizardProgressPath = path.join(DATA_DIR, "wizard-progress.json");
-  await ensureFileExists(wizardProgressPath, []);
-  const data = await readFile(wizardProgressPath, "utf-8");
-  const wizardProgress: WizardProgress[] = JSON.parse(data);
+  const wizard = await prisma.wizardProgress.findUnique({
+    where: { id: wizardId },
+  });
 
-  const wizardIndex = wizardProgress.findIndex((w) => w.id === wizardId);
-  if (wizardIndex === -1) {
+  if (!wizard) {
     throw new Error("Wizard not found");
   }
 
-  const wizard = wizardProgress[wizardIndex];
+  const currentStepData = (wizard.stepData as Record<number, any>) || {};
+  currentStepData[stepNumber] = stepData;
 
-  // Update step data
-  wizard.stepData[stepNumber] = stepData;
-
-  // Mark step as completed if not already
-  if (!wizard.completedSteps.includes(stepNumber)) {
-    wizard.completedSteps.push(stepNumber);
-    wizard.completedSteps.sort((a, b) => a - b);
+  const completedSteps = [...wizard.completedSteps];
+  if (!completedSteps.includes(stepNumber)) {
+    completedSteps.push(stepNumber);
+    completedSteps.sort((a, b) => a - b);
   }
 
-  // Move to next step
+  let nextStep = wizard.currentStep;
   if (stepNumber < 11) {
-    wizard.currentStep = stepNumber + 1;
+    nextStep = stepNumber + 1;
   }
 
-  wizard.lastSavedAt = Date.now();
+  const updatedWizard = await prisma.wizardProgress.update({
+    where: { id: wizardId },
+    data: {
+      stepData: currentStepData as any,
+      completedSteps,
+      currentStep: nextStep,
+      lastSavedAt: new Date(),
+    },
+  });
 
-  wizardProgress[wizardIndex] = wizard;
-  await writeFile(wizardProgressPath, JSON.stringify(wizardProgress, null, 2));
-
-  return wizard;
+  return {
+    id: updatedWizard.id,
+    farmerId: updatedWizard.farmerId || "",
+    userId: updatedWizard.userId,
+    currentStep: updatedWizard.currentStep,
+    completedSteps: updatedWizard.completedSteps,
+    stepData: updatedWizard.stepData as any,
+    resumeToken: updatedWizard.resumeToken,
+    lastSavedAt: updatedWizard.lastSavedAt.getTime(),
+    completedAt: updatedWizard.completedAt ? updatedWizard.completedAt.getTime() : null,
+    expiresAt: updatedWizard.expiresAt.getTime(),
+  };
 }
 
 /**
- * Complete wizard and create farmer + farm
+ * Complete wizard and create/update farmer + farm in database
  */
 export async function completeWizard(
   wizardId: string,
   userId: string,
 ): Promise<{ farmer: Farmer; farm: Farm }> {
-  const wizardProgressPath = path.join(DATA_DIR, "wizard-progress.json");
-  const farmersPath = path.join(DATA_DIR, "farmers.json");
-  const farmsPath = path.join(DATA_DIR, "farms.json");
+  const wizard = await prisma.wizardProgress.findUnique({
+    where: { id: wizardId },
+  });
 
-  // Ensure files exist
-  await ensureFileExists(wizardProgressPath, []);
-  await ensureFileExists(farmersPath, []);
-  await ensureFileExists(farmsPath, []);
-
-  // Get wizard
-  const wizardData = await readFile(wizardProgressPath, "utf-8");
-  const wizardProgress: WizardProgress[] = JSON.parse(wizardData);
-  const wizardIndex = wizardProgress.findIndex((w) => w.id === wizardId);
-
-  if (wizardIndex === -1) {
+  if (!wizard) {
     throw new Error("Wizard not found");
   }
 
-  const wizard = wizardProgress[wizardIndex];
+  const stepData = (wizard.stepData as Record<number, any>) || {};
 
-  // Validate all steps completed (steps 1 to 10 are data steps)
-  if (wizard.completedSteps.length < 10) {
-    throw new Error("Not all steps completed");
+  // Check if farmer already exists for user, or create one
+  let farmer = await prisma.farmer.findUnique({
+    where: { userId },
+  });
+
+  if (!farmer) {
+    farmer = await prisma.farmer.create({
+      data: {
+        userId,
+        fullName: stepData[1]?.fullName || "Farmer",
+        phone: stepData[1]?.phone || "",
+        email: stepData[1]?.email || "",
+        nationalId: stepData[1]?.nationalId || "",
+      },
+    });
+  } else {
+    // Update existing farmer with wizard step 1 details
+    farmer = await prisma.farmer.update({
+      where: { userId },
+      data: {
+        fullName: stepData[1]?.fullName || farmer.fullName,
+        phone: stepData[1]?.phone || farmer.phone,
+        email: stepData[1]?.email || farmer.email,
+        nationalId: stepData[1]?.nationalId || farmer.nationalId,
+      },
+    });
   }
 
-  // Create farmer record
-  const farmer: Farmer = {
-    id: generateId(),
-    userId,
-    fullName: wizard.stepData[1]?.fullName,
-    phone: wizard.stepData[1]?.phone,
-    email: wizard.stepData[1]?.email,
-    nationalId: wizard.stepData[1]?.nationalId,
-    createdAt: Date.now(),
-    updatedAt: Date.now(),
-  };
-
-  // Create farm record
-  const farm: Farm = {
-    id: generateId(),
-    farmerId: farmer.id,
-    farmName: wizard.stepData[2]?.farmName,
-    farmType: wizard.stepData[2]?.farmType,
-    soilType: wizard.stepData[3]?.soilType,
-    waterSource: wizard.stepData[3]?.waterSource,
-    district: wizard.stepData[4]?.district,
-    upazila: wizard.stepData[5]?.upazila,
-    union: wizard.stepData[6]?.union,
-    areaSize: wizard.stepData[7]?.areaSize,
-    areaUnit: wizard.stepData[7]?.areaUnit,
-    primaryCrop: wizard.stepData[8]?.primaryCrop,
-    farmingMethod: wizard.stepData[8]?.farmingMethod || "organic",
-    secondaryCrops: wizard.stepData[9]?.secondaryCrops || [],
-    annualBudget: wizard.stepData[10]?.annualBudget,
-    budgetCurrency: wizard.stepData[10]?.budgetCurrency,
-    createdAt: Date.now(),
-    updatedAt: Date.now(),
-  };
-
-  // Save farmer and farm
-  const farmers: Farmer[] = JSON.parse(await readFile(farmersPath, "utf-8"));
-  const farms: Farm[] = JSON.parse(await readFile(farmsPath, "utf-8"));
-
-  farmers.push(farmer);
-  farms.push(farm);
-
-  await writeFile(farmersPath, JSON.stringify(farmers, null, 2));
-  await writeFile(farmsPath, JSON.stringify(farms, null, 2));
+  // Create new farm
+  const farm = await prisma.farm.create({
+    data: {
+      farmerId: farmer.id,
+      farmName: stepData[2]?.farmName || "",
+      farmType: stepData[2]?.farmType || "",
+      soilType: stepData[3]?.soilType || "",
+      waterSource: stepData[3]?.waterSource || "",
+      district: stepData[4]?.district || "",
+      upazila: stepData[5]?.upazila || "",
+      union: stepData[6]?.union || "",
+      areaSize: stepData[7]?.areaSize ? parseFloat(stepData[7].areaSize) : 0,
+      areaUnit: stepData[7]?.areaUnit || "",
+      primaryCrop: stepData[8]?.primaryCrop || "",
+      farmingMethod: stepData[8]?.farmingMethod || "organic",
+      secondaryCrops: stepData[9]?.secondaryCrops || [],
+      annualBudget: stepData[10]?.annualBudget ? parseFloat(stepData[10].annualBudget) : 0,
+      budgetCurrency: stepData[10]?.budgetCurrency || "BDT",
+    },
+  });
 
   // Mark wizard as completed
-  wizard.farmerId = farmer.id;
-  wizard.completedAt = Date.now();
-  wizardProgress[wizardIndex] = wizard;
-  await writeFile(wizardProgressPath, JSON.stringify(wizardProgress, null, 2));
+  await prisma.wizardProgress.update({
+    where: { id: wizardId },
+    data: {
+      farmerId: farmer.id,
+      completedAt: new Date(),
+    },
+  });
 
-  return { farmer, farm };
+  return {
+    farmer: {
+      id: farmer.id,
+      userId: farmer.userId,
+      fullName: farmer.fullName,
+      phone: farmer.phone || "",
+      email: farmer.email || "",
+      nationalId: farmer.nationalId || "",
+      createdAt: farmer.createdAt.getTime(),
+      updatedAt: farmer.updatedAt.getTime(),
+    },
+    farm: {
+      id: farm.id,
+      farmerId: farm.farmerId,
+      farmName: farm.farmName || "",
+      farmType: farm.farmType || "",
+      soilType: farm.soilType || "",
+      waterSource: farm.waterSource || "",
+      district: farm.district || "",
+      upazila: farm.upazila || "",
+      union: farm.union || "",
+      areaSize: farm.areaSize || 0,
+      areaUnit: farm.areaUnit || "",
+      primaryCrop: farm.primaryCrop,
+      farmingMethod: farm.farmingMethod,
+      secondaryCrops: farm.secondaryCrops || [],
+      annualBudget: farm.annualBudget || 0,
+      budgetCurrency: farm.budgetCurrency || "BDT",
+      createdAt: farm.createdAt.getTime(),
+      updatedAt: farm.updatedAt.getTime(),
+    },
+  };
 }
 
 /**
@@ -309,39 +321,70 @@ export async function completeWizard(
 export async function getFarmerByUserId(
   userId: string,
 ): Promise<Farmer | null> {
-  const farmersPath = path.join(DATA_DIR, "farmers.json");
-  await ensureFileExists(farmersPath, []);
-
-  const data = await readFile(farmersPath, "utf-8");
-  const farmers: Farmer[] = JSON.parse(data);
-
-  return farmers.find((f) => f.userId === userId) || null;
+  const farmer = await prisma.farmer.findUnique({
+    where: { userId },
+  });
+  if (!farmer) return null;
+  return {
+    id: farmer.id,
+    userId: farmer.userId,
+    fullName: farmer.fullName,
+    phone: farmer.phone || "",
+    email: farmer.email || "",
+    nationalId: farmer.nationalId || "",
+    createdAt: farmer.createdAt.getTime(),
+    updatedAt: farmer.updatedAt.getTime(),
+  };
 }
 
 /**
  * Get farmer by ID
  */
 export async function getFarmerById(farmerId: string): Promise<Farmer | null> {
-  const farmersPath = path.join(DATA_DIR, "farmers.json");
-  await ensureFileExists(farmersPath, []);
-
-  const data = await readFile(farmersPath, "utf-8");
-  const farmers: Farmer[] = JSON.parse(data);
-
-  return farmers.find((f) => f.id === farmerId) || null;
+  const farmer = await prisma.farmer.findUnique({
+    where: { id: farmerId },
+  });
+  if (!farmer) return null;
+  return {
+    id: farmer.id,
+    userId: farmer.userId,
+    fullName: farmer.fullName,
+    phone: farmer.phone || "",
+    email: farmer.email || "",
+    nationalId: farmer.nationalId || "",
+    createdAt: farmer.createdAt.getTime(),
+    updatedAt: farmer.updatedAt.getTime(),
+  };
 }
 
 /**
  * Get farm by ID
  */
 export async function getFarmById(farmId: string): Promise<Farm | null> {
-  const farmsPath = path.join(DATA_DIR, "farms.json");
-  await ensureFileExists(farmsPath, []);
-
-  const data = await readFile(farmsPath, "utf-8");
-  const farms: Farm[] = JSON.parse(data);
-
-  return farms.find((f) => f.id === farmId) || null;
+  const farm = await prisma.farm.findUnique({
+    where: { id: farmId },
+  });
+  if (!farm) return null;
+  return {
+    id: farm.id,
+    farmerId: farm.farmerId,
+    farmName: farm.farmName || "",
+    farmType: farm.farmType || "",
+    soilType: farm.soilType || "",
+    waterSource: farm.waterSource || "",
+    district: farm.district || "",
+    upazila: farm.upazila || "",
+    union: farm.union || "",
+    areaSize: farm.areaSize || 0,
+    areaUnit: farm.areaUnit || "",
+    primaryCrop: farm.primaryCrop,
+    farmingMethod: farm.farmingMethod,
+    secondaryCrops: farm.secondaryCrops || [],
+    annualBudget: farm.annualBudget || 0,
+    budgetCurrency: farm.budgetCurrency || "BDT",
+    createdAt: farm.createdAt.getTime(),
+    updatedAt: farm.updatedAt.getTime(),
+  };
 }
 
 /**
@@ -350,78 +393,119 @@ export async function getFarmById(farmId: string): Promise<Farm | null> {
 export async function getFarmByFarmerId(
   farmerId: string,
 ): Promise<Farm | null> {
-  const farmsPath = path.join(DATA_DIR, "farms.json");
-  await ensureFileExists(farmsPath, []);
-
-  const data = await readFile(farmsPath, "utf-8");
-  const farms: Farm[] = JSON.parse(data);
-
-  return farms.find((f) => f.farmerId === farmerId) || null;
+  const farm = await prisma.farm.findFirst({
+    where: { farmerId },
+  });
+  if (!farm) return null;
+  return {
+    id: farm.id,
+    farmerId: farm.farmerId,
+    farmName: farm.farmName || "",
+    farmType: farm.farmType || "",
+    soilType: farm.soilType || "",
+    waterSource: farm.waterSource || "",
+    district: farm.district || "",
+    upazila: farm.upazila || "",
+    union: farm.union || "",
+    areaSize: farm.areaSize || 0,
+    areaUnit: farm.areaUnit || "",
+    primaryCrop: farm.primaryCrop,
+    farmingMethod: farm.farmingMethod,
+    secondaryCrops: farm.secondaryCrops || [],
+    annualBudget: farm.annualBudget || 0,
+    budgetCurrency: farm.budgetCurrency || "BDT",
+    createdAt: farm.createdAt.getTime(),
+    updatedAt: farm.updatedAt.getTime(),
+  };
 }
 
+/**
+ * Update farmer profile
+ */
 export async function updateFarmerProfile(
   userId: string,
   update: { fullName: string; phone: string; email: string }
 ): Promise<Farmer | null> {
-  const farmersPath = path.join(DATA_DIR, "farmers.json");
-  await ensureFileExists(farmersPath, []);
+  const farmer = await prisma.farmer.update({
+    where: { userId },
+    data: {
+      fullName: update.fullName,
+      phone: update.phone,
+      email: update.email,
+    },
+  });
 
-  const data = await readFile(farmersPath, "utf-8");
-  const farmers: Farmer[] = JSON.parse(data);
-
-  const farmerIndex = farmers.findIndex((f) => f.userId === userId);
-  if (farmerIndex === -1) {
-    return null;
-  }
-
-  farmers[farmerIndex] = {
-    ...farmers[farmerIndex],
-    fullName: update.fullName,
-    phone: update.phone,
-    email: update.email,
-    updatedAt: Date.now(),
+  return {
+    id: farmer.id,
+    userId: farmer.userId,
+    fullName: farmer.fullName,
+    phone: farmer.phone || "",
+    email: farmer.email || "",
+    nationalId: farmer.nationalId || "",
+    createdAt: farmer.createdAt.getTime(),
+    updatedAt: farmer.updatedAt.getTime(),
   };
-
-  await writeFile(farmersPath, JSON.stringify(farmers, null, 2));
-  return farmers[farmerIndex];
 }
 
+/**
+ * Update farm details
+ */
 export async function updateFarm(
   farmId: string,
   update: Partial<Omit<Farm, "id" | "farmerId" | "createdAt" | "updatedAt">>
 ): Promise<Farm | null> {
-  const farmsPath = path.join(DATA_DIR, "farms.json");
-  await ensureFileExists(farmsPath, []);
+  const farm = await prisma.farm.update({
+    where: { id: farmId },
+    data: {
+      farmName: update.farmName,
+      farmType: update.farmType,
+      soilType: update.soilType,
+      waterSource: update.waterSource,
+      district: update.district,
+      upazila: update.upazila,
+      union: update.union,
+      areaSize: update.areaSize,
+      areaUnit: update.areaUnit,
+      primaryCrop: update.primaryCrop,
+      farmingMethod: update.farmingMethod,
+      secondaryCrops: update.secondaryCrops,
+      annualBudget: update.annualBudget,
+      budgetCurrency: update.budgetCurrency,
+    },
+  });
 
-  const data = await readFile(farmsPath, "utf-8");
-  const farms: Farm[] = JSON.parse(data);
-
-  const index = farms.findIndex((f) => f.id === farmId);
-  if (index === -1) return null;
-
-  farms[index] = {
-    ...farms[index],
-    ...update,
-    updatedAt: Date.now(),
+  return {
+    id: farm.id,
+    farmerId: farm.farmerId,
+    farmName: farm.farmName || "",
+    farmType: farm.farmType || "",
+    soilType: farm.soilType || "",
+    waterSource: farm.waterSource || "",
+    district: farm.district || "",
+    upazila: farm.upazila || "",
+    union: farm.union || "",
+    areaSize: farm.areaSize || 0,
+    areaUnit: farm.areaUnit || "",
+    primaryCrop: farm.primaryCrop,
+    farmingMethod: farm.farmingMethod,
+    secondaryCrops: farm.secondaryCrops || [],
+    annualBudget: farm.annualBudget || 0,
+    budgetCurrency: farm.budgetCurrency || "BDT",
+    createdAt: farm.createdAt.getTime(),
+    updatedAt: farm.updatedAt.getTime(),
   };
-
-  await writeFile(farmsPath, JSON.stringify(farms, null, 2));
-  return farms[index];
 }
 
+/**
+ * Delete farm
+ */
 export async function deleteFarm(farmId: string): Promise<boolean> {
-  const farmsPath = path.join(DATA_DIR, "farms.json");
-  await ensureFileExists(farmsPath, []);
-
-  const data = await readFile(farmsPath, "utf-8");
-  const farms: Farm[] = JSON.parse(data);
-
-  const filtered = farms.filter((f) => f.id !== farmId);
-  if (filtered.length === farms.length) return false;
-
-  await writeFile(farmsPath, JSON.stringify(filtered, null, 2));
-  return true;
+  try {
+    await prisma.farm.delete({
+      where: { id: farmId },
+    });
+    return true;
+  } catch {
+    return false;
+  }
 }
-
-export type { Farm, Farmer, WizardProgress };
-
