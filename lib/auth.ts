@@ -82,7 +82,7 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET || "krishokos-vercel-build-fallback-secret-key",
 };
 
 export async function requireUser(): Promise<AuthUser | null> {
