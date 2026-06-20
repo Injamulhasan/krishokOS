@@ -386,5 +386,42 @@ export async function updateFarmerProfile(
   return farmers[farmerIndex];
 }
 
+export async function updateFarm(
+  farmId: string,
+  update: Partial<Omit<Farm, "id" | "farmerId" | "createdAt" | "updatedAt">>
+): Promise<Farm | null> {
+  const farmsPath = path.join(DATA_DIR, "farms.json");
+  await ensureFileExists(farmsPath, []);
+
+  const data = await readFile(farmsPath, "utf-8");
+  const farms: Farm[] = JSON.parse(data);
+
+  const index = farms.findIndex((f) => f.id === farmId);
+  if (index === -1) return null;
+
+  farms[index] = {
+    ...farms[index],
+    ...update,
+    updatedAt: Date.now(),
+  };
+
+  await writeFile(farmsPath, JSON.stringify(farms, null, 2));
+  return farms[index];
+}
+
+export async function deleteFarm(farmId: string): Promise<boolean> {
+  const farmsPath = path.join(DATA_DIR, "farms.json");
+  await ensureFileExists(farmsPath, []);
+
+  const data = await readFile(farmsPath, "utf-8");
+  const farms: Farm[] = JSON.parse(data);
+
+  const filtered = farms.filter((f) => f.id !== farmId);
+  if (filtered.length === farms.length) return false;
+
+  await writeFile(farmsPath, JSON.stringify(filtered, null, 2));
+  return true;
+}
+
 export type { Farm, Farmer, WizardProgress };
 
