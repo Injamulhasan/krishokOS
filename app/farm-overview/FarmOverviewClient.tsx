@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
@@ -15,9 +15,14 @@ import {
   ChevronRight,
   ShieldCheck,
   Sprout,
+  Settings,
+  Trash2,
+  X,
 } from "lucide-react";
 
 interface FarmData {
+  id: string;
+  farmName: string;
   primaryCrop: string;
   farmingMethod: string;
   district: string;
@@ -282,14 +287,103 @@ export default function FarmOverviewClient({
     null
   );
 
-  // Load completed stages from localStorage
+  // Load completed stages from localStorage with crop-specific suffix
   const [completedStages, setCompletedStages] = useState<string[]>(() => {
     if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("krishokos-completed-stages");
+      const saved = localStorage.getItem(`krishokos-completed-stages-${farm.primaryCrop.toLowerCase()}`);
       return saved ? JSON.parse(saved) : [];
     }
     return [];
   });
+
+  // Sync checklist completed stages if the crop changes dynamically
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem(`krishokos-completed-stages-${farm.primaryCrop.toLowerCase()}`);
+      setCompletedStages(saved ? JSON.parse(saved) : []);
+    }
+  }, [farm.primaryCrop]);
+
+  // Edit/Delete Modal States
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editForm, setEditForm] = useState({
+    farmName: farm.farmName,
+    areaSize: farm.areaSize,
+    areaUnit: farm.areaUnit,
+    farmingMethod: farm.farmingMethod,
+    soilType: farm.soilType,
+    waterSource: farm.waterSource,
+    annualBudget: farm.annualBudget,
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [modalError, setModalError] = useState<string | null>(null);
+
+  const handleOpenModal = () => {
+    setEditForm({
+      farmName: farm.farmName,
+      areaSize: farm.areaSize,
+      areaUnit: farm.areaUnit,
+      farmingMethod: farm.farmingMethod,
+      soilType: farm.soilType,
+      waterSource: farm.waterSource,
+      annualBudget: farm.annualBudget,
+    });
+    setModalError(null);
+    setIsModalOpen(true);
+  };
+
+  const handleUpdateFarm = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setModalError(null);
+    try {
+      const res = await fetch(`/api/farm/${farm.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editForm),
+      });
+      if (!res.ok) {
+        throw new Error("Failed to update field details");
+      }
+      setIsModalOpen(false);
+      router.refresh();
+    } catch (err) {
+      setModalError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDeleteFarm = async () => {
+    if (!confirm(`Are you sure you want to delete your ${farm.primaryCrop.charAt(0).toUpperCase() + farm.primaryCrop.slice(1)} field? This will delete all records related to this field.`)) {
+      return;
+    }
+    setDeleting(true);
+    setModalError(null);
+    try {
+      const res = await fetch(`/api/farm/${farm.id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        throw new Error("Failed to delete farm");
+      }
+      // Clear localStorage completed stages for this crop
+      localStorage.removeItem(`krishokos-completed-stages-${farm.primaryCrop.toLowerCase()}`);
+      
+      // Also clear individual stage progress keys
+      allStages.forEach(s => {
+        localStorage.removeItem(`krishokos-stage-${s.id}-${farm.primaryCrop.toLowerCase()}`);
+      });
+      
+      setIsModalOpen(false);
+      router.push("/dashboard");
+      router.refresh();
+    } catch (err) {
+      setModalError(err instanceof Error ? err.message : "An error occurred");
+      setDeleting(false);
+    }
+  };
 
   const cropName =
     farm.primaryCrop.toLowerCase() === "banana" ? "Banana" : farm.primaryCrop.toLowerCase() === "papaya" ? "Papaya" : farm.primaryCrop.charAt(0).toUpperCase() + farm.primaryCrop.slice(1);
@@ -335,8 +429,15 @@ export default function FarmOverviewClient({
               <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
             </button>
             <div className="flex-1">
-              <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-                {farmerName}&apos;s {cropName} Farm
+              <h1 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                {farmerName}&apos;s {cropName} Field Overview
+                <button
+                  onClick={handleOpenModal}
+                  className="p-1 hover:bg-gray-100 dark:hover:bg-emerald-900/30 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-emerald-400 rounded-lg transition cursor-pointer"
+                  title="Field Settings"
+                >
+                  <Settings className="w-5 h-5" />
+                </button>
               </h1>
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 {farm.district} • {areaDisplay} • {methodName} Farming
@@ -468,7 +569,7 @@ export default function FarmOverviewClient({
           <div className="flex items-center gap-2 mb-6">
             <Sprout className="w-5 h-5 text-green-600 dark:text-emerald-400" />
             <h2 className="text-xl font-extrabold text-gray-900 dark:text-white">
-              Personalized Farm Insights &amp; Analytics
+              Personalized {cropName} Insights &amp; Analytics
             </h2>
           </div>
 
@@ -690,7 +791,7 @@ export default function FarmOverviewClient({
                   key={stage.id}
                   onClick={() =>
                     status !== "locked" &&
-                    router.push(`/farm-overview/stage/${stage.id}`)
+                    router.push(`/farm-overview/stage/${stage.id}?crop=${farm.primaryCrop.toLowerCase()}`)
                   }
                   className={`border-2 rounded-xl p-5 transition ${
                     status === "completed"
@@ -741,6 +842,169 @@ export default function FarmOverviewClient({
           </div>
         </div>
       </main>
+
+      {/* Edit/Delete Settings Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
+          <div className="bg-white dark:bg-[#121c15] border border-gray-200 dark:border-emerald-950 rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden transition-all duration-300 transform scale-100">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-emerald-900/20 bg-green-50/50 dark:bg-emerald-950/20">
+              <h3 className="font-bold text-lg text-gray-900 dark:text-white flex items-center gap-2">
+                <Settings className="w-5 h-5 text-green-600 dark:text-emerald-400" /> Field Settings
+              </h3>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="p-1.5 hover:bg-gray-200 dark:hover:bg-emerald-900/30 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-xl transition cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <form onSubmit={handleUpdateFarm} className="p-6 space-y-4">
+              {modalError && (
+                <div className="p-3 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/30 rounded-xl text-red-600 dark:text-red-400 text-sm">
+                  {modalError}
+                </div>
+              )}
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-2">
+                  <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1.5">
+                    Field Name
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={editForm.farmName}
+                    onChange={(e) => setEditForm({ ...editForm, farmName: e.target.value })}
+                    className="w-full rounded-xl border border-gray-200 dark:border-emerald-900/40 bg-white dark:bg-[#0c1a0e] px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1.5">
+                    Area Size
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    min="1"
+                    value={editForm.areaSize}
+                    onChange={(e) => setEditForm({ ...editForm, areaSize: Number(e.target.value) })}
+                    className="w-full rounded-xl border border-gray-200 dark:border-emerald-900/40 bg-white dark:bg-[#0c1a0e] px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1.5">
+                    Area Unit
+                  </label>
+                  <select
+                    value={editForm.areaUnit}
+                    onChange={(e) => setEditForm({ ...editForm, areaUnit: e.target.value })}
+                    className="w-full rounded-xl border border-gray-200 dark:border-emerald-900/40 bg-white dark:bg-[#0c1a0e] px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500"
+                  >
+                    <option value="bigha">Bigha</option>
+                    <option value="katha">Katha</option>
+                    <option value="decimal">Decimal</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1.5">
+                    Farming Method
+                  </label>
+                  <select
+                    value={editForm.farmingMethod}
+                    onChange={(e) => setEditForm({ ...editForm, farmingMethod: e.target.value })}
+                    className="w-full rounded-xl border border-gray-200 dark:border-emerald-900/40 bg-white dark:bg-[#0c1a0e] px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500"
+                  >
+                    <option value="residue_free">Residue-Free</option>
+                    <option value="organic">Organic</option>
+                    <option value="chemical">Chemical</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1.5">
+                    Soil Type
+                  </label>
+                  <select
+                    value={editForm.soilType}
+                    onChange={(e) => setEditForm({ ...editForm, soilType: e.target.value })}
+                    className="w-full rounded-xl border border-gray-200 dark:border-emerald-900/40 bg-white dark:bg-[#0c1a0e] px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500"
+                  >
+                    <option value="loamy">Loamy</option>
+                    <option value="clay">Clay</option>
+                    <option value="sandy">Sandy</option>
+                    <option value="silty">Silty</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1.5">
+                    Water Source
+                  </label>
+                  <select
+                    value={editForm.waterSource}
+                    onChange={(e) => setEditForm({ ...editForm, waterSource: e.target.value })}
+                    className="w-full rounded-xl border border-gray-200 dark:border-emerald-900/40 bg-white dark:bg-[#0c1a0e] px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500"
+                  >
+                    <option value="groundwater">Groundwater</option>
+                    <option value="surface_water">Surface Water</option>
+                    <option value="rainwater">Rainwater</option>
+                    <option value="municipal">Municipal</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1.5">
+                    Annual Budget (BDT)
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    min="1"
+                    value={editForm.annualBudget}
+                    onChange={(e) => setEditForm({ ...editForm, annualBudget: Number(e.target.value) })}
+                    className="w-full rounded-xl border border-gray-200 dark:border-emerald-900/40 bg-white dark:bg-[#0c1a0e] px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500"
+                  />
+                </div>
+              </div>
+
+              {/* Modal Footer */}
+              <div className="flex items-center justify-between border-t border-gray-100 dark:border-emerald-900/20 pt-5 mt-6">
+                <button
+                  type="button"
+                  onClick={handleDeleteFarm}
+                  disabled={deleting || submitting}
+                  className="flex items-center gap-1.5 bg-red-50 hover:bg-red-100 dark:bg-red-950/20 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400 font-semibold px-4 py-2.5 rounded-xl text-sm transition cursor-pointer disabled:opacity-50"
+                >
+                  <Trash2 className="w-4 h-4" /> Delete Field
+                </button>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsModalOpen(false)}
+                    disabled={deleting || submitting}
+                    className="bg-gray-100 dark:bg-emerald-950/40 hover:bg-gray-200 dark:hover:bg-emerald-900/30 text-gray-700 dark:text-gray-300 font-semibold px-4 py-2.5 rounded-xl text-sm transition cursor-pointer disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={deleting || submitting}
+                    className="bg-green-600 hover:bg-green-700 dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition cursor-pointer disabled:opacity-50"
+                  >
+                    {submitting ? "Saving..." : "Save Changes"}
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -228,24 +228,29 @@ const stageConfigs: Record<string, StageConfig> = {
 
 interface StageClientProps {
   stageId: string;
+  crop?: string;
 }
 
-export default function StageClient({ stageId }: StageClientProps) {
+export default function StageClient({ stageId, crop }: StageClientProps) {
   const router = useRouter();
   const config = stageConfigs[stageId];
 
   const [checkedTasks, setCheckedTasks] = useState<Record<number, boolean>>({});
   const [isCompleted, setIsCompleted] = useState(false);
 
-  // Load completion state from localStorage
+  // Load completion state from localStorage with crop-specific suffix
   useEffect(() => {
-    const saved = localStorage.getItem(`krishokos-stage-${stageId}`);
+    const suffix = crop ? `-${crop.toLowerCase()}` : "";
+    const saved = localStorage.getItem(`krishokos-stage-${stageId}${suffix}`);
     if (saved) {
       const parsed = JSON.parse(saved);
       setCheckedTasks(parsed.checkedTasks || {});
       setIsCompleted(parsed.isCompleted || false);
+    } else {
+      setCheckedTasks({});
+      setIsCompleted(false);
     }
-  }, [stageId]);
+  }, [stageId, crop]);
 
   if (!config) {
     return (
@@ -263,9 +268,10 @@ export default function StageClient({ stageId }: StageClientProps) {
     if (isCompleted) return; // Don't allow changes after completion
     setCheckedTasks((prev) => {
       const updated = { ...prev, [taskId]: !prev[taskId] };
-      // Save to localStorage
+      // Save to localStorage with crop-specific suffix
+      const suffix = crop ? `-${crop.toLowerCase()}` : "";
       localStorage.setItem(
-        `krishokos-stage-${stageId}`,
+        `krishokos-stage-${stageId}${suffix}`,
         JSON.stringify({ checkedTasks: updated, isCompleted: false })
       );
       return updated;
@@ -275,27 +281,29 @@ export default function StageClient({ stageId }: StageClientProps) {
   const handleMarkComplete = () => {
     if (!allTasksChecked) return;
 
+    const suffix = crop ? `-${crop.toLowerCase()}` : "";
+
     // Save completion
     localStorage.setItem(
-      `krishokos-stage-${stageId}`,
+      `krishokos-stage-${stageId}${suffix}`,
       JSON.stringify({ checkedTasks, isCompleted: true })
     );
     setIsCompleted(true);
 
-    // Update global completed stages list
-    const saved = localStorage.getItem("krishokos-completed-stages");
+    // Update global completed stages list with crop-specific suffix
+    const saved = localStorage.getItem(`krishokos-completed-stages${suffix}`);
     const completedStages: string[] = saved ? JSON.parse(saved) : [];
     if (!completedStages.includes(stageId)) {
       completedStages.push(stageId);
       localStorage.setItem(
-        "krishokos-completed-stages",
+        `krishokos-completed-stages${suffix}`,
         JSON.stringify(completedStages)
       );
     }
 
     // Navigate back to farm overview after a brief delay
     setTimeout(() => {
-      router.push("/farm-overview");
+      router.push(`/farm-overview${crop ? `?crop=${crop}` : ""}`);
     }, 800);
   };
 
@@ -305,14 +313,14 @@ export default function StageClient({ stageId }: StageClientProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center gap-3">
             <button
-              onClick={() => router.push("/farm-overview")}
+              onClick={() => router.push(`/farm-overview${crop ? `?crop=${crop}` : ""}`)}
               className="p-2 hover:bg-gray-100 dark:hover:bg-emerald-900/30 rounded-lg transition cursor-pointer"
             >
               <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
             </button>
             <div>
               <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-                {config.title}
+                {crop ? `${crop.charAt(0).toUpperCase() + crop.slice(1)} - ` : ""}{config.title}
               </h1>
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 {config.subtitle}

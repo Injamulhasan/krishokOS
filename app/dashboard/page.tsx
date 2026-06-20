@@ -4,6 +4,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import HeaderActions from "@/components/dashboard/HeaderActions";
 import AlertsWidget from "@/components/dashboard/AlertsWidget";
+import { readFile } from "fs/promises";
+import path from "path";
 
 // ─── Icon components (inline SVG to avoid adding lucide-react dep) ───────────
 const SproutIcon = () => (
@@ -74,7 +76,35 @@ export default async function DashboardPage() {
 
   // Load user's actual farm details if they completed the setup wizard
   const farmer = await getFarmerByUserId(user.id);
-  const farm = farmer ? await getFarmByFarmerId(farmer.id) : null;
+  
+  // Load all farms for this user's farmer records dynamically
+  let farmerFarms: any[] = [];
+  if (farmer) {
+    try {
+      const DATA_DIR = process.env.VERCEL === "1" || process.cwd().includes("/var/task") ? "/tmp" : path.join(process.cwd(), "data");
+      const farmersPath = path.join(DATA_DIR, "farmers.json");
+      const farmsPath = path.join(DATA_DIR, "farms.json");
+      
+      const farmersData = await readFile(farmersPath, "utf-8");
+      const farmsData = await readFile(farmsPath, "utf-8");
+      
+      const allFarmers = JSON.parse(farmersData);
+      const allFarms = JSON.parse(farmsData);
+      
+      const userFarmers = allFarmers.filter((f: any) => f.userId === user.id);
+      const farmerIds = userFarmers.map((f: any) => f.id);
+      
+      farmerFarms = allFarms.filter((f: any) => farmerIds.includes(f.farmerId));
+    } catch (e) {
+      console.error("Error loading user farms:", e);
+      const singleFarm = await getFarmByFarmerId(farmer.id);
+      if (singleFarm) {
+        farmerFarms = [singleFarm];
+      }
+    }
+  }
+
+  const farm = farmerFarms.length > 0 ? farmerFarms[0] : null;
 
   const userName = user.name || "Farmer";
   const userDistrict = farm?.district || "Bangladesh";
@@ -346,18 +376,38 @@ export default async function DashboardPage() {
   ];
 
   // Dynamically populate quickStats based on completed farm setup
-  const activeFarms = farm ? "1" : "2";
-  const totalArea = farm ? `${farm.areaSize} ${farm.areaUnit === "decimal" ? "Dec" : farm.areaUnit === "bigha" ? "Bigha" : "Katha"}` : "0 ac";
+  const activeFarmsCount = farmerFarms.length;
+  const activeFarms = activeFarmsCount > 0 ? String(activeFarmsCount) : "0";
   
-  let cropsGrowing = "2";
+  let totalAreaVal = 0;
+  let areaUnitDisplay = "Bigha";
+  if (activeFarmsCount > 0) {
+    totalAreaVal = farmerFarms.reduce((sum, f) => sum + f.areaSize, 0);
+    const firstUnit = farmerFarms[0].areaUnit;
+    areaUnitDisplay = firstUnit === "decimal" ? "Dec" : firstUnit === "bigha" ? "Bigha" : firstUnit === "katha" ? "Katha" : "acres";
+  }
+  const totalArea = activeFarmsCount > 0 ? `${totalAreaVal} ${areaUnitDisplay}` : "0 ac";
+  
+  let cropsGrowing = "None";
   const cropName = farm ? (farm.primaryCrop.charAt(0).toUpperCase() + farm.primaryCrop.slice(1)) : "";
-  if (farm) {
-    const primary = cropName;
-    const count = farm.secondaryCrops?.length || 0;
-    cropsGrowing = count > 0 ? `${primary} + ${count}` : primary;
+  if (activeFarmsCount > 0) {
+    const cropNames = Array.from(new Set(farmerFarms.map(f => f.primaryCrop.charAt(0).toUpperCase() + f.primaryCrop.slice(1))));
+    cropsGrowing = cropNames.join(" + ");
+  }
+
+  const allCrops = Array.from(new Set(farmerFarms.map(f => f.primaryCrop.toLowerCase())));
+  
+  let cropDisplayName = "";
+  if (activeFarmsCount > 0) {
+    const cropNames = Array.from(new Set(farmerFarms.map(f => f.primaryCrop.charAt(0).toUpperCase() + f.primaryCrop.slice(1))));
+    cropDisplayName = cropNames.join(" & ");
   }
   
-  const alertsCount = farm ? (farm.farmingMethod === "residue_free" ? "1" : "0") : "3";
+  let alertsCountVal = 0;
+  if (activeFarmsCount > 0) {
+    alertsCountVal = farmerFarms.reduce((sum, f) => sum + (f.farmingMethod === "residue_free" ? 1 : 0), 0);
+  }
+  const alertsCount = activeFarmsCount > 0 ? String(alertsCountVal) : "0";
 
   const quickStats = [
     {
@@ -427,14 +477,6 @@ export default async function DashboardPage() {
                   {userDistrict} &bull; {today}
                 </p>
               </div>
-              {farm && (
-                <Link
-                  href="/farm-overview"
-                  className="inline-flex items-center gap-2 rounded-xl bg-green-600 hover:bg-green-700 dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white font-semibold px-5 py-2.5 text-sm transition shadow-sm cursor-pointer self-start sm:self-center"
-                >
-                  See Full Farm Overview →
-                </Link>
-              )}
             </div>
 
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -455,34 +497,81 @@ export default async function DashboardPage() {
                 </div>
               ))}
             </div>
+
+            {/* ── Your Cultivated Fields ── */}
+            {farm && (
+              <div className="mt-6 border-t border-gray-100 dark:border-emerald-900/10 pt-6">
+                <h3 className="text-xs font-extrabold text-gray-400 dark:text-emerald-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                  <SproutIcon /> Your Cultivated Crop Fields
+                </h3>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {farmerFarms.map((f) => {
+                    const capitalizedCrop = f.primaryCrop.charAt(0).toUpperCase() + f.primaryCrop.slice(1);
+                    return (
+                      <Link
+                        key={f.id}
+                        href={`/farm-overview?crop=${f.primaryCrop.toLowerCase()}`}
+                        className="flex items-center justify-between p-4 rounded-2xl bg-white dark:bg-[#121c15] border border-gray-100 dark:border-emerald-900/40 hover:border-green-500 dark:hover:border-emerald-500 hover:shadow-md transition group duration-300 cursor-pointer"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-green-50 dark:bg-emerald-950/40 text-green-600 dark:text-emerald-400 group-hover:scale-110 transition-transform">
+                            <SproutIcon />
+                          </div>
+                          <div>
+                            <span className="font-bold text-gray-900 dark:text-white block text-sm">
+                              {capitalizedCrop} Field
+                            </span>
+                            <span className="text-xs text-gray-500 dark:text-gray-400 block mt-0.5 font-medium">
+                              {f.areaSize} {f.areaUnit === "decimal" ? "Dec" : f.areaUnit === "bigha" ? "Bigha" : "Katha"} • {f.farmingMethod === "residue_free" ? "Residue-Free" : f.farmingMethod === "organic" ? "Organic" : "Chemical"}
+                            </span>
+                          </div>
+                        </div>
+                        <span className="text-green-600 dark:text-emerald-400 text-xs font-semibold flex items-center gap-1 opacity-80 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300">
+                          Overview <ArrowRightIcon />
+                        </span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Right: Today's Advisory */}
-          <div className="rounded-2xl bg-gradient-to-br from-green-600 to-emerald-700 p-6 text-white">
-            <div className="mb-4 flex items-center gap-2">
-              <CalendarIcon />
-              <span className="font-semibold">Today&apos;s Advisory</span>
+          <div className="h-fit rounded-2xl bg-gradient-to-br from-green-600 via-emerald-600 to-teal-700 p-6 text-white shadow-xl border border-green-500/20 dark:border-emerald-500/10 hover:shadow-2xl hover:shadow-green-500/10 transition-all duration-300">
+            <div className="mb-5 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="p-2 bg-white/10 rounded-lg backdrop-blur-sm">
+                  <CalendarIcon />
+                </span>
+                <span className="font-bold tracking-wide">Today&apos;s Advisory</span>
+              </div>
+              <span className="text-xs bg-green-500/30 text-green-100 font-bold px-2 py-0.5 rounded-full border border-green-400/20 animate-pulse">
+                Live
+              </span>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-3.5">
               {advisoryTasks.map((item) => (
-                <div key={item.time} className="flex gap-3">
-                  <span className="mt-0.5 w-16 shrink-0 text-xs text-green-200">
+                <div key={item.time} className="flex gap-3 bg-white/5 dark:bg-black/10 p-3 rounded-xl border border-white/5 hover:bg-white/10 transition-colors duration-200">
+                  <span className="mt-0.5 shrink-0 text-xs font-bold text-emerald-200 bg-emerald-800/40 px-2 py-0.5 rounded uppercase tracking-wider h-fit">
                     {item.time}
                   </span>
-                  <p className="text-sm text-white/90">{item.task}</p>
+                  <p className="text-sm text-white/90 leading-relaxed">{item.task}</p>
                 </div>
               ))}
             </div>
             <Link
               href="/ai-agronomist"
-              className="mt-4 block w-full rounded-lg bg-white/20 py-2 text-center text-sm font-medium text-white transition hover:bg-white/30"
+              className="mt-6 flex items-center justify-center gap-2 w-full rounded-xl bg-white text-emerald-800 py-3 text-center text-sm font-bold shadow-md hover:bg-emerald-50 hover:shadow-lg active:scale-[0.98] transition-all duration-200"
             >
-              Ask AI Agronomist →
+              <BotIcon />
+              <span>Ask AI Agronomist</span>
+              <ArrowRightIcon />
             </Link>
           </div>
         </div>
         {/* ── Personalized Farm Setup Alert / Analytics ── */}
-        {!farm ? (
+        {!farm && (
           <div className="rounded-2xl border border-amber-200 dark:border-amber-900/30 bg-amber-50/50 dark:bg-amber-950/20 p-6 shadow-sm transition-colors duration-300">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-start gap-3">
@@ -499,26 +588,6 @@ export default async function DashboardPage() {
                 className="inline-flex shrink-0 items-center justify-center rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold px-5 py-2.5 text-sm transition shadow-sm cursor-pointer"
               >
                 Set Up Your Farm →
-              </Link>
-            </div>
-          </div>
-        ) : (
-          <div className="rounded-2xl border border-green-200 dark:border-emerald-900/30 bg-green-50/40 dark:bg-[#121c15] p-6 shadow-sm transition-colors duration-300">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="flex items-start gap-3">
-                <span className="mt-0.5 text-xl">✨</span>
-                <div>
-                  <h4 className="font-bold text-green-900 dark:text-emerald-400">Personalized Farm Plan Active</h4>
-                  <p className="text-sm text-green-700 dark:text-[#e2ede4]/80 mt-1">
-                    Your {cropName} farm setup is complete. You can now view your custom crop calendar, soil diagnostics, and track the 8-stage cultivation workflow.
-                  </p>
-                </div>
-              </div>
-              <Link
-                href="/farm-overview"
-                className="inline-flex shrink-0 items-center justify-center rounded-xl bg-green-600 hover:bg-green-700 dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white font-bold px-5 py-2.5 text-sm transition shadow-sm cursor-pointer"
-              >
-                See Full Farm Overview →
               </Link>
             </div>
           </div>
@@ -643,6 +712,8 @@ export default async function DashboardPage() {
             ))}
           </div>
         </section>
+
+
 
         {/* ── Footer ── */}
         <div className="border-t border-gray-100 dark:border-emerald-900/10 py-4 text-center text-sm text-gray-400 dark:text-gray-500">
