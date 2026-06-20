@@ -357,7 +357,7 @@ export default async function DashboardPage() {
   let totalAreaVal = 0;
   let areaUnitDisplay = "Bigha";
   if (activeFarmsCount > 0) {
-    totalAreaVal = farmerFarms.reduce((sum, f) => sum + f.areaSize, 0);
+    totalAreaVal = farmerFarms.reduce((sum, f) => sum + (f.areaSize ?? 0), 0);
     const firstUnit = farmerFarms[0].areaUnit;
     areaUnitDisplay = firstUnit === "decimal" ? "Dec" : firstUnit === "bigha" ? "Bigha" : firstUnit === "katha" ? "Katha" : "acres";
   }
