@@ -350,8 +350,9 @@ export default async function DashboardPage() {
   const totalArea = farm ? `${farm.areaSize} ${farm.areaUnit === "decimal" ? "Dec" : farm.areaUnit === "bigha" ? "Bigha" : "Katha"}` : "0 ac";
   
   let cropsGrowing = "2";
+  const cropName = farm ? (farm.primaryCrop.charAt(0).toUpperCase() + farm.primaryCrop.slice(1)) : "";
   if (farm) {
-    const primary = farm.primaryCrop.charAt(0).toUpperCase() + farm.primaryCrop.slice(1);
+    const primary = cropName;
     const count = farm.secondaryCrops?.length || 0;
     cropsGrowing = count > 0 ? `${primary} + ${count}` : primary;
   }
@@ -417,12 +418,24 @@ export default async function DashboardPage() {
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Left: welcome + quick stats */}
           <div className="lg:col-span-2">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Welcome back, {userName}!
-            </h2>
-            <p className="mb-6 text-gray-500 dark:text-gray-400">
-              {userDistrict} &bull; {today}
-            </p>
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  Welcome back, {userName}!
+                </h2>
+                <p className="text-gray-500 dark:text-gray-400">
+                  {userDistrict} &bull; {today}
+                </p>
+              </div>
+              {farm && (
+                <Link
+                  href="/farm-overview"
+                  className="inline-flex items-center gap-2 rounded-xl bg-green-600 hover:bg-green-700 dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white font-semibold px-5 py-2.5 text-sm transition shadow-sm cursor-pointer self-start sm:self-center"
+                >
+                  See Full Farm Overview →
+                </Link>
+              )}
+            </div>
 
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
               {quickStats.map((stat) => (
@@ -490,160 +503,25 @@ export default async function DashboardPage() {
             </div>
           </div>
         ) : (
-          <section className="space-y-6">
-            <div className="flex items-center gap-2 border-b border-gray-200 dark:border-emerald-900/40 pb-3">
-              <span className="text-green-600 dark:text-emerald-400">
-                <SproutIcon />
-              </span>
-              <h3 className="text-xl font-extrabold text-gray-900 dark:text-white">
-                Personalized Farm Insights &amp; Analytics
-              </h3>
+          <div className="rounded-2xl border border-green-200 dark:border-emerald-900/30 bg-green-50/40 dark:bg-[#121c15] p-6 shadow-sm transition-colors duration-300">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-start gap-3">
+                <span className="mt-0.5 text-xl">✨</span>
+                <div>
+                  <h4 className="font-bold text-green-900 dark:text-emerald-400">Personalized Farm Plan Active</h4>
+                  <p className="text-sm text-green-700 dark:text-[#e2ede4]/80 mt-1">
+                    Your {cropName} farm setup is complete. You can now view your custom crop calendar, soil diagnostics, and track the 8-stage cultivation workflow.
+                  </p>
+                </div>
+              </div>
+              <Link
+                href="/farm-overview"
+                className="inline-flex shrink-0 items-center justify-center rounded-xl bg-green-600 hover:bg-green-700 dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white font-bold px-5 py-2.5 text-sm transition shadow-sm cursor-pointer"
+              >
+                See Full Farm Overview →
+              </Link>
             </div>
-
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {/* Soil & Irrigation Diagnostics Card */}
-              <div className="rounded-2xl border border-gray-100 dark:border-emerald-900/40 bg-white dark:bg-[#121c15] p-6 shadow-sm transition-all duration-300 hover:shadow-md">
-                <div className="mb-4 flex items-center justify-between">
-                  <h4 className="text-sm font-bold uppercase tracking-wider text-[#4B5A44] dark:text-emerald-400">
-                    Soil &amp; Irrigation
-                  </h4>
-                  <span className="rounded-full bg-blue-50 dark:bg-blue-950/40 px-2.5 py-1 text-xs font-bold text-blue-700 dark:text-blue-400">
-                    Active Profile
-                  </span>
-                </div>
-                
-                <div className="space-y-4">
-                  <div>
-                    <span className="text-xs text-gray-400 dark:text-gray-500 block font-medium">Soil Type</span>
-                    <span className="font-bold text-gray-900 dark:text-[#e2ede4] block capitalize">{farm.soilType} Soil</span>
-                  </div>
-                  <div>
-                    <span className="text-xs text-gray-400 dark:text-gray-500 block font-medium">Water Source</span>
-                    <span className="font-bold text-gray-900 dark:text-[#e2ede4] block capitalize">{farm.waterSource.replace(/_/g, " ")}</span>
-                  </div>
-                  <div className="mt-2 text-sm text-gray-600 dark:text-gray-400 border-t border-gray-100 dark:border-emerald-900/10 pt-3 leading-relaxed">
-                    {farm.soilType.toLowerCase() === "loamy" && "Loamy soil is ideal for banana/papaya crops, providing excellent nutrient absorption and drainage."}
-                    {farm.soilType.toLowerCase() === "clay" && "Clay soil is highly compact. Build raised beds to avoid root rot and monitor irrigation closely."}
-                    {farm.soilType.toLowerCase() === "sandy" && "Sandy soil drains nutrients quickly. Supplement with organic compost and irrigate in short, frequent intervals."}
-                    {farm.soilType.toLowerCase() === "silty" && "Silty soil holds moisture well but can crust. Aerate soil around crop root zones regularly."}
-                  </div>
-                  <div className="text-xs text-[#00963F] dark:text-emerald-400 font-semibold bg-green-50 dark:bg-emerald-950/20 p-2.5 rounded-lg border dark:border-emerald-900/10">
-                    {farm.waterSource.toLowerCase() === "groundwater" && "✓ Groundwater is optimal. Annual pH test recommended to target 6.5."}
-                    {farm.waterSource.toLowerCase() === "surface_water" && "✓ Filter surface water before application to eliminate fungal spores."}
-                    {farm.waterSource.toLowerCase() === "rainwater" && "✓ Perfect quality. Clean collection tanks to prevent bacterial buildup."}
-                    {farm.waterSource.toLowerCase() === "municipal" && "✓ Check chlorine content weekly to avoid root damage."}
-                  </div>
-                </div>
-              </div>
-
-              {/* Cultivation Method Strategy Card */}
-              <div className="rounded-2xl border border-gray-100 dark:border-emerald-900/40 bg-white dark:bg-[#121c15] p-6 shadow-sm transition-all duration-300 hover:shadow-md">
-                <div className="mb-4 flex items-center justify-between">
-                  <h4 className="text-sm font-bold uppercase tracking-wider text-[#4B5A44] dark:text-emerald-400">
-                    Farming Strategy
-                  </h4>
-                  <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${
-                    farm.farmingMethod === "residue_free"
-                      ? "bg-emerald-100 text-emerald-800"
-                      : farm.farmingMethod === "organic"
-                      ? "bg-purple-100 text-purple-800"
-                      : "bg-gray-100 text-gray-800"
-                  } [&.bg-emerald-100]:dark:bg-emerald-950/40 [&.text-emerald-800]:dark:text-emerald-400 [&.bg-purple-100]:dark:bg-purple-950/40 [&.text-purple-800]:dark:text-purple-400 [&.bg-gray-100]:dark:bg-[#081009] [&.text-gray-800]:dark:text-gray-400`}>
-                    {farm.farmingMethod === "residue_free" && "Residue-Free"}
-                    {farm.farmingMethod === "organic" && "Organic"}
-                    {farm.farmingMethod === "chemical" && "Chemical"}
-                  </span>
-                </div>
-                
-                <div className="space-y-4">
-                  <div>
-                    <span className="text-xs text-gray-400 dark:text-gray-500 block font-medium">Target Market</span>
-                    <span className="font-bold text-gray-900 dark:text-[#e2ede4] block">
-                      {farm.farmingMethod === "residue_free" && "International Export Market"}
-                      {farm.farmingMethod === "organic" && "Premium Organic Retailers"}
-                      {farm.farmingMethod === "chemical" && "Traditional Local Markets"}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-xs text-gray-400 dark:text-gray-500 block font-medium">Core Compliance</span>
-                    <span className="font-bold text-gray-900 dark:text-[#e2ede4] block">
-                      {farm.farmingMethod === "residue_free" && "GlobalGAP Certification Readiness"}
-                      {farm.farmingMethod === "organic" && "IFOAM Standard (Zero Synthetic Inputs)"}
-                      {farm.farmingMethod === "chemical" && "NPK Optimization Program"}
-                    </span>
-                  </div>
-                  <div className="mt-2 text-sm text-gray-600 dark:text-gray-400 border-t border-gray-100 dark:border-emerald-900/10 pt-3 leading-relaxed">
-                    {farm.farmingMethod === "residue_free" && "Priority: Zero pesticide trace. Rely on biological controls like Trichoderma viride and yellow sticky traps."}
-                    {farm.farmingMethod === "organic" && "Priority: Soil life enhancement. Rely on compost, vermicompost, and organic liquid manure sprays."}
-                    {farm.farmingMethod === "chemical" && "Priority: Cost containment. Optimize fertilizer application to prevent nutrient runoff and soil acidification."}
-                  </div>
-                </div>
-              </div>
-
-              {/* Financial ROI and Cost Target Card */}
-              <div className="rounded-2xl border border-gray-100 dark:border-emerald-900/40 bg-white dark:bg-[#121c15] p-6 shadow-sm transition-all duration-300 hover:shadow-md">
-                <div className="mb-4 flex items-center justify-between">
-                  <h4 className="text-sm font-bold uppercase tracking-wider text-[#4B5A44] dark:text-emerald-400">
-                    Financial Forecast
-                  </h4>
-                  <span className="rounded-full bg-amber-50 dark:bg-amber-950/30 px-2.5 py-1 text-xs font-bold text-amber-700 dark:text-amber-400">
-                    75/25 Model
-                  </span>
-                </div>
-                
-                <div className="space-y-3">
-                  <div>
-                    <span className="text-xs text-gray-400 dark:text-gray-500 block font-medium">Annual Budget Allocation</span>
-                    <div className="mt-1 flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
-                      <span>Inputs (75%): {Math.round(farm.annualBudget * 0.75).toLocaleString()} {farm.budgetCurrency}</span>
-                      <span>Reserve (25%): {Math.round(farm.annualBudget * 0.25).toLocaleString()} {farm.budgetCurrency}</span>
-                    </div>
-                    <div className="mt-1 h-2 w-full rounded-full bg-gray-100 dark:bg-[#081009] overflow-hidden flex">
-                      <div className="h-full bg-green-600" style={{ width: "75%" }} />
-                      <div className="h-full bg-amber-500" style={{ width: "25%" }} />
-                    </div>
-                  </div>
-                  
-                  <div className="border-t border-gray-100 dark:border-emerald-900/10 pt-3">
-                    <span className="text-xs text-gray-400 dark:text-gray-500 block font-medium">Projected Yield (Est.)</span>
-                    <span className="font-bold text-gray-900 dark:text-[#e2ede4] block text-lg">
-                      {/* Yield calculation: Banana ≈ 14 tons/acre, Papaya ≈ 22 tons/acre */}
-                      {(() => {
-                        let acres = 0;
-                        if (farm.areaUnit === "decimal") acres = farm.areaSize / 100;
-                        else if (farm.areaUnit === "bigha") acres = farm.areaSize / 3.03;
-                        else if (farm.areaUnit === "katha") acres = farm.areaSize / 60.6;
-                        else acres = farm.areaSize; // fallback
-
-                        const yieldPerAcre = farm.primaryCrop.toLowerCase() === "banana" ? 14 : 22;
-                        const totalYield = Math.round(acres * yieldPerAcre * 10) / 10;
-                        return `${totalYield} Metric Tons`;
-                      })()}
-                    </span>
-                  </div>
-
-                  <div>
-                    <span className="text-xs text-gray-400 dark:text-gray-500 block font-medium">Projected Revenue (Est.)</span>
-                    <span className="font-bold text-[#00963F] dark:text-emerald-400 block text-xl">
-                      {(() => {
-                        let acres = 0;
-                        if (farm.areaUnit === "decimal") acres = farm.areaSize / 100;
-                        else if (farm.areaUnit === "bigha") acres = farm.areaSize / 3.03;
-                        else if (farm.areaUnit === "katha") acres = farm.areaSize / 60.6;
-                        else acres = farm.areaSize;
-
-                        const pricePerKg = farm.primaryCrop.toLowerCase() === "banana" ? 15 : 20;
-                        const yieldPerAcre = farm.primaryCrop.toLowerCase() === "banana" ? 14 : 22;
-                        const totalKg = acres * yieldPerAcre * 1000;
-                        const revenue = Math.round(totalKg * pricePerKg);
-                        return `${revenue.toLocaleString()} ${farm.budgetCurrency}`;
-                      })()}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
+          </div>
         )}
 
         {/* ── Disease & Pest Alert Network Widget ── */}
