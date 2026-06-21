@@ -14,125 +14,55 @@ Our mission is to create the digital infrastructure that enables farmers to impr
 
 ---
 
-## ✨ Current Features
+## ✨ Features & Architecture
 
-### 🌐 Bilingual Landing Page
+### 🌐 Bilingual User Interface
+A fully localized client dashboard and onboarding wizard supporting Bengali ↔ English language switching:
+- Sticky navigation header with mobile menu and dynamic dark mode toggles.
+- All translations driven from a structured language state — no DOM manipulation needed.
 
-A fully localized marketing landing page supporting Bengali ↔ English language switching:
+### 🔐 Authentication System (NextAuth.js)
+Complete account management with secure session persistence across client-side route transitions:
+- **NextAuth.js Session Management**: Wired with Credentials Provider for credentials-based sign-in.
+- **Auto-Login on Registration**: Upon filling out the signup form, users are automatically authenticated and redirected directly to their dashboard.
+- **Bypassed Email Verification**: Bypasses the email verification step in the signup pipeline (since SMTP servers are unconfigured in dev) to enable a seamless onboarding flow.
+- **Session Context Provider**: Wrapped root layout with `<SessionProvider>` to persist sessions on client-side routing.
+- **Protected Pages & API Routes**: Implemented `getServerSession` checks on the server side to redirect unauthenticated users to `/auth/signin`.
 
-- Sticky navigation header with mobile menu
-- Hero section with CTA buttons, platform stats, and crop showcase
-- Module cards, cultivation methods, farm setup grid
-- Journey timeline and platform feature overview
-- AI assistant panel and footer
-- All content driven from a translations object — no DOM toggling
+### 🗄️ Database & ORM (Prisma & Supabase PostgreSQL)
+Transitioned the database architecture from local flat JSON files to a production-ready cloud database:
+- **Supabase PostgreSQL**: Primary cloud database provider hosting users, farmers, farms, and setup sessions.
+- **Prisma ORM**: Utilized for clean, typesafe database queries, migrations, and model definitions.
+- **Connection Pooling**: Configured transaction pooling through Supabase Pooler (`DATABASE_URL` via port `6543`) for application requests, and direct connection (`DIRECT_URL` via port `5432`) for schema migrations and pushes.
 
-### 🔐 Authentication System
-
-Complete account management with session persistence:
-
-- **Signup** — name, email, phone, and password registration
-- **Email Verification** — token-based email confirmation flow
-- **Sign In** — email or phone + password login
-- **Forgot Password / Reset Password** — secure token-based password recovery
-- **Session Persistence** — HTTP-only cookie with JWT-style session token
-- **Protected Routes** — unauthenticated users redirected to sign-in
-
-User data is stored in `data/users.json` with PBKDF2 password hashing. Verification and reset tokens are cleared after use.
-
-Auth pages live at `/auth/signup`, `/auth/signin`, `/auth/verify-email`, `/auth/forgot-password`, `/auth/resetpassword`.
-
-Auth API endpoints:
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/auth/signup` | Create new account |
-| POST | `/api/auth/signin` | Sign in with credentials |
-| POST | `/api/auth/verify-email` | Verify email with token |
-| POST | `/api/auth/forgot-password` | Request password reset |
-| POST | `/api/auth/resetpassword` | Set new password |
-| GET | `/api/auth/me` | Get current session user |
-| GET | `/api/dashboard` | Protected dashboard route |
-
-### 🌿 Plant Management & Crop/Method Selection
-
-A pre-wizard selection screen at `/plant-management` where authenticated users choose:
-
-- **Crop** — Banana Farming or Papaya Farming (selection cards with hover animations and green glow borders)
-- **Farming Method** — Residue-Free, Organic, or Chemical (with badges and check indicators)
-
-Selections are posted to the backend and pre-populate the farm setup wizard before it opens.
+#### Database Models:
+- `User` / `Account` / `Session` / `VerificationToken`: Standard NextAuth-managed models for login sessions.
+- `Farmer`: Represents a farmer profile associated with a `User`.
+- `Farm`: Represents a cultivated crop field (soil type, water source, district, Upazila, Union, size, crop, farming method).
+- `WizardProgress`: Tracks the current step, completed steps, and JSON step data of active onboarding setup sessions.
 
 ### 🧙 11-Step Farm Setup Wizard
+A guided onboarding wizard at `/wizard` for authenticated users to create their first farm profile. Features cascading location dropdowns, unit conversion, step validation, and database storage.
+- **Cascading Dropdowns**: Dynamic District → Upazila → Union data hierarchy.
+- **Unit Converter**: Converts between Bigha, Decimal, and Katha.
+- **Wizard Data Persistence**: Wizard progress (current step, JSON form data) is saved directly in the database (`WizardProgress`), enabling users to resume on any device.
 
-A guided onboarding wizard at `/wizard` for authenticated users to create their first farm profile. Features save/resume, cascading location dropdowns, unit conversion, step validation, and redirect to dashboard on completion.
-
-| Step | Content |
-|------|---------|
-| 1 | Farmer Identity (name, phone, email, national ID) |
-| 2 | Farm Name & Type (pre-populated from plant-management) |
-| 3 | Soil & Water (soil type, water source) |
-| 4–6 | Location cascade (District → Upazila → Union) |
-| 7 | Land Size with unit converter (decimal ↔ bigha ↔ katha) |
-| 8 | Primary Crop (pre-populated from plant-management) |
-| 9 | Secondary Crops (multi-select) |
-| 10 | Annual Budget |
-| 11 | Review & Confirm (read-only summary before submission) |
-
-Wizard state is tracked in `data/wizardprogress.json`. On completion, FARMER and FARM records are created in `data/farmers.json` and `data/farms.json`.
-
-Wizard API endpoints:
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/wizard/start` | Initialize or reset wizard with crop/method |
-| PUT | `/api/wizard/step/[stepNumber]` | Save individual step data |
-| GET | `/api/wizard/progress` | Fetch current wizard state |
-| GET | `/api/wizard/locations` | Cascading district → upazila → union data |
-| POST | `/api/wizard/complete` | Finalize wizard and create farm records |
-
-### 📊 Personalized Dashboard
-
-The dashboard at `/dashboard` adapts based on whether the user has completed farm setup:
-
-**Before setup:** Renders original mock statistics (Farms: 2, Crops: 2, Alerts: 3) and a default advisory calendar.
-
-**After setup:** Dynamically renders personalized analytics based on actual farm data:
-
-- **Quick Stats** — actual active farm count, exact land area with units, crop list, alerts
-- **Personalized Farm Insights & Analytics Panel:**
-  - Farm Profile Overview (crop, location, farming method)
-  - Soil & Irrigation Diagnostics (custom guidance based on soil type and water source)
-  - Farming Method Compliance & Strategy (target market, GAP protocols, NPK guidelines)
-  - Financial Forecast & ROI (projected yield, 75/25 input cost model, revenue estimates)
-  - Custom Daily Advisory Calendar (crop and method-specific schedules)
-- Full ERP module grid (Production, Inventory, Scheduling, etc.) always visible below
+### 📊 Adaptable Dashboard & Crop Overviews
+The dashboard at `/dashboard` fetches farmer and farm data via Prisma and adapts:
+- **Before Setup**: Prompts the user to complete the 11-step wizard and displays blank states.
+- **After Setup**: Displays personalized analytics, NPK advice, ROI forecasting, and a crop stage calendar.
+- **Stage checklists**: checklist states (cultivation calendar stages) are isolated per crop (`krishokos-stage-[id]-[cropName]`) using client local storage to prevent progress crossover between Papaya and Banana.
 
 ---
 
 ## 🛠 Tech Stack
 
-### Frontend
-
-- Next.js 16 (App Router)
-- React 19
-- TypeScript
-- Tailwind CSS
-- ShadCN UI
-- Lucide React
-- `next/image` for optimized image rendering
-
-### Backend
-
-- Next.js API Routes (App Router)
-- JSON file-based data storage (`data/*.json`)
-- PBKDF2 password hashing
-- HTTP-only cookie sessions
-
-### Development Tools
-
-- Git / GitHub
-- Vercel (deployment)
+- **Framework**: Next.js 16 (App Router)
+- **Runtime**: React 19 / TypeScript
+- **Styling**: Tailwind CSS / ShadCN UI / Lucide Icons
+- **Auth**: NextAuth.js
+- **ORM**: Prisma ORM v5.21.0
+- **Database**: Supabase (PostgreSQL)
 
 ---
 
@@ -143,217 +73,112 @@ krishokOS/
 │
 ├── app/
 │   ├── api/
-│   │   ├── auth/               # Auth API endpoints
-│   │   │   ├── signup/
-│   │   │   ├── signin/
-│   │   │   ├── verify-email/
-│   │   │   ├── forgot-password/
-│   │   │   ├── resetpassword/
-│   │   │   ├── me/
-│   │   │   └── dashboard/
-│   │   └── wizard/             # Wizard API endpoints
-│   │       ├── start/
-│   │       ├── step/[stepNumber]/
-│   │       ├── progress/
-│   │       ├── locations/
-│   │       └── complete/
-│   ├── auth/                   # Auth UI pages
-│   │   ├── signup/
-│   │   ├── signin/
-│   │   ├── verify-email/
-│   │   ├── forgot-password/
-│   │   └── resetpassword/
+│   │   ├── auth/               # NextAuth endpoints & profiles
+│   │   │   ├── [...nextauth]/  # Catch-all NextAuth API route
+│   │   │   ├── signup/         # Hashing & User creation route
+│   │   │   └── profile/        # Farmer profile updates
+│   │   │
+│   │   ├── farm/               # Farm management routes (PATCH, DELETE)
+│   │   └── wizard/             # Wizard API endpoints (start, steps, complete)
+│   │
+│   ├── auth/                   # Authentication UI pages
+│   │   ├── signin/             # NextAuth credentials sign-in page
+│   │   ├── signup/             # Account registration page
+│   │   └── verify-email/       # Verification redirect helper
+│   │
 │   ├── dashboard/              # Protected dashboard page
-│   ├── plant-management/       # Crop & method selector
-│   ├── wizard/                 # 11-step farm setup wizard
-│   ├── layout.tsx              # Bengali/Latin fonts, metadata
-│   ├── page.tsx                # Entry point → LandingPage
-│   └── globals.css
+│   ├── farm-overview/          # Multi-crop cultivation workspace
+│   ├── plant-management/       # Pre-wizard crop & method selector
+│   ├── wizard/                 # Onboarding wizard container
+│   ├── layout.tsx              # Fonts, theme context, SessionProvider wrapper
+│   └── page.tsx                # Marketing landing page
 │
 ├── components/
-│   ├── wizard/
-│   │   ├── WizardLayout.tsx
-│   │   ├── ProgressTracker.tsx
-│   │   ├── SuccessModal.tsx
-│   │   ├── useWizardProgress.ts
-│   │   └── steps/              # Step1.tsx through Step11.tsx
-│   ├── LandingPage.tsx         # Language state owner; composes all sections
-│   ├── Header.tsx              # Nav with language toggle and mobile menu
-│   ├── HeroSection.tsx
-│   ├── ModuleCards.tsx
-│   ├── CropsShowcase.tsx
-│   ├── Hero.tsx                # Thin wrapper → LandingPage
-│   ├── button.tsx
-│   └── PlantManagementClient.tsx
+│   ├── dashboard/              # Stats widgets, advisories, action buttons
+│   ├── providers/              # AuthProvider Session Context
+│   └── wizard/                 # Onboarding step components (Step1 - Step11)
 │
 ├── lib/
-│   ├── auth.ts                 # Password hash, JWT tokens, session cookies
-│   ├── wizardDb.ts             # Wizard, farmer, and farm data helpers
-│   ├── validation.ts           # Step validators (all 11 steps)
-│   ├── unitConverter.ts        # Bigha ↔ decimal ↔ katha conversions
-│   └── utils.ts                # cn() Tailwind class helper
+│   ├── auth.ts                 # NextAuth authOptions & requireUser helpers
+│   ├── prisma.ts               # Shared PrismaClient initialization
+│   ├── wizardDb.ts             # Prisma-driven onboarding query adapters
+│   ├── unitConverter.ts        # Bigha ↔ decimal ↔ katha utilities
+│   └── validation.ts           # Onboarding validation rules
+│
+├── prisma/
+│   └── schema.prisma           # Prisma database schema definition
 │
 ├── data/
-│   ├── users.json              # User accounts (hashed passwords)
-│   ├── farmers.json            # Farmer profiles
-│   ├── farms.json              # Farm records (incl. farmingMethod)
-│   ├── wizardprogress.json     # Wizard state per user
-│   ├── locations.json          # Bangladesh districts → upazilas → unions
-│   └── crops.json              # Static crop list
+│   ├── crops.json              # Static crop lookups
+│   └── locations.json          # Static Bangladesh location lookups
 │
-├── public/                     # Static assets
-├── next.config.mjs             # Unsplash remote image pattern, allowedDevOrigins
-├── components.json
 ├── tsconfig.json
-├── eslint.config.mjs
-└── package.json
+├── package.json
+└── next.config.mjs
 ```
 
 ---
 
-## 🎨 Design Principles
-
-- **Bengali-first** — default language is Bengali; all UI copy is fully translated
-- **Clean and modern** — agriculture-inspired visual language with green tones
-- **Accessible and responsive** — mobile menu, fluid layouts, readable typography
-- **Component-driven** — each page section is an isolated, reusable component
-- **Data-driven text** — navigation links, stats, cards, and steps all render from structured arrays
-
----
-
-## 🚦 Getting Started
+## 🚦 Developer Getting Started
 
 ### Prerequisites
-
 - Node.js v20 or later
-- Git
-- npm
+- Supabase account (Postgres Database)
 
-### Installation
+### 1. Environment Setup
+Create a `.env` file in the root of the project:
+
+```env
+# Supabase PostgreSQL Connection Strings
+# URL-encode special characters in the password (e.g. '#' to '%23')
+DATABASE_URL="postgresql://postgres.YOUR-PROJECT-ID:YOUR-PASSWORD@aws-1-ap-northeast-2.pooler.supabase.com:6543/postgres?pgbouncer=true"
+DIRECT_URL="postgresql://postgres.YOUR-PROJECT-ID:YOUR-PASSWORD@aws-1-ap-northeast-2.pooler.supabase.com:5432/postgres"
+
+# NextAuth Settings
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="your-generate-32-char-random-secret-key"
+```
+
+### 2. Install & Generate
+Install dependencies and generate the Prisma Client:
 
 ```bash
-git clone https://github.com/Injamulhasan/krishokOS.git
-cd krishokOS
+# Install dependencies
 npm install
+
+# Push schema to database
+npx prisma db push
+
+# Generate Prisma Client
+npx prisma generate
+```
+
+### 3. Run Development Server
+```bash
 npm run dev
 ```
+Open [http://localhost:3000](http://localhost:3000) to view the application.
 
-Open your browser at:
+---
 
-```
-http://localhost:3000
-```
+## ☁️ Production Deployment (Vercel)
 
-For network access (e.g. from another device on your LAN), the dev server is configured with `allowedDevOrigins` so HMR works at your local network address as well.
+KrishokOS is configured to deploy seamlessly to **Vercel**.
 
-### Build for Production
-
-```bash
-npm run build
-npm start
+### Vercel Build Command Configuration
+Vercel caches dependencies during deployments, which can result in an outdated Prisma Client. To prevent this, the build script in `package.json` has been updated to automatically generate the Client before compilation:
+```json
+"build": "prisma generate && next build"
 ```
 
----
+### Required Vercel Environment Variables
+You must add the following environment variables in your **Vercel Project Settings**:
 
-## ☁️ Deployment
+| Key | Value | Example |
+|-----|-------|---------|
+| `DATABASE_URL` | Supabase Pooler URI | `postgresql://postgres.mjf...:6543/postgres?pgbouncer=true` |
+| `DIRECT_URL` | Supabase Direct Port URI | `postgresql://postgres.mjf...:5432/postgres` |
+| `NEXTAUTH_SECRET` | 32-character random key | `your-secret-key` |
+| `NEXTAUTH_URL` | Deployed Production URL | `https://krishok-os.vercel.app` |
 
-KrishokOS is deployed on **Vercel**.
-
-Live URL: [krishok-os.vercel.app](https://krishok-os.vercel.app)
-
-Every push to `main` triggers a new production deployment. Feature branches generate preview deployments automatically.
-
----
-
-## 🌿 Git Workflow
-
-```bash
-# Create a feature branch
-git checkout -b feature/feature-name
-
-# Commit and push
-git add .
-git commit -m "Describe your changes"
-git push origin feature/feature-name
-
-# Open a Pull Request on GitHub and merge after review
-```
-
----
-
-## 🛣 Roadmap
-
-### Phase 1 — Marketing Website ✅
-
-- [x] Bilingual landing page (Bengali / English)
-- [x] Responsive header, hero, modules, crops showcase
-- [x] Vercel deployment
-
-### Phase 2 — Authentication ✅
-
-- [x] Signup, sign-in, email verification
-- [x] Password reset flow
-- [x] Session persistence (HTTP-only cookie)
-- [x] Protected dashboard route
-
-### Phase 3 — Farm Setup ✅
-
-- [x] Plant management & crop/method selection screen
-- [x] 11-step onboarding wizard with save/resume
-- [x] Cascading location dropdowns (District → Upazila → Union)
-- [x] Land unit converter (bigha ↔ decimal ↔ katha)
-- [x] FARMER and FARM record creation on wizard completion
-
-### Phase 4 — Personalized Dashboard ✅
-
-- [x] Dynamic stats based on actual farm data
-- [x] Soil & irrigation advisory panel
-- [x] Farming method compliance & strategy guidance
-- [x] Financial forecast & ROI estimations (75/25 model)
-- [x] Custom daily advisory calendar
-
-### Phase 5 — AI Assistant *(Planned)*
-
-- [ ] Disease detection from images
-- [ ] Smart irrigation recommendations
-- [ ] Fertilizer optimization
-- [ ] Weather-based advisory
-- [ ] Predictive yield analytics
-
-### Phase 6 — Export Platform *(Planned)*
-
-- [ ] GAP compliance tracking
-- [ ] Traceability records
-- [ ] Residue-free production workflows
-- [ ] Harvest documentation
-- [ ] Export readiness scoring
-
----
-
-## 🤝 Contributing
-
-Contributions, ideas, and feedback are welcome.
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push the branch
-5. Open a Pull Request
-
----
-
-## 📄 License
-
-This project is currently under active development. A formal open-source license will be added in a future release.
-
----
-
-## 👨‍💻 Author
-
-**Injamul Hasan Akash**
-
-Building digital solutions for the future of agriculture in Bangladesh.
-
----
-
-> 🌱 Building the future of Bangladeshi agriculture through technology.
+*Note: Do not wrap variable values in double quotes (`"`) when pasting them into the Vercel dashboard fields, as Vercel will read the quotes literally and trigger database connection crashes.*
